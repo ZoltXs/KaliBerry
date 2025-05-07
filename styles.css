@@ -1,30 +1,15 @@
-/* Estilos para KaliBerry */
-
-/* Variables globales */
-:root {
-  --background: #121212;
-  --foreground: #f0f0f0;
-  --primary: #ff79c6;
-  --secondary: #bd93f9;
-  --accent: #50fa7b;
-  --warning: #ffb86c;
-  --error: #ff5555;
-  --success: #50fa7b;
-  --border: #44475a;
-  --selected: #44475a;
-  --hover: #282a36;
-}
+/* Estilos para KaliBerry - Versión Blanco y Negro */
 
 /* Estilos generales */
 Screen {
-  background: var(--background);
-  color: var(--foreground);
+  background: #000000;
+  color: #ffffff;
 }
 
 /* Encabezado */
 Header {
-  background: var(--primary);
-  color: var(--background);
+  background: #333333;
+  color: #ffffff;
   text-style: bold;
   dock: top;
   height: 1;
@@ -32,8 +17,8 @@ Header {
 
 /* Pie de página */
 Footer {
-  background: var(--secondary);
-  color: var(--background);
+  background: #333333;
+  color: #ffffff;
   dock: bottom;
   height: 1;
 }
@@ -48,8 +33,8 @@ Footer {
 #title,
 #tool-title,
 #about-title {
-  background: var(--secondary);
-  color: var(--background);
+  background: #333333;
+  color: #ffffff;
   width: 100%;
   height: 3;
   content-align: center middle;
@@ -58,7 +43,7 @@ Footer {
 
 /* Listas */
 ListView {
-  border: solid var(--border);
+  border: solid #444444;
   width: 100%;
   height: 100%;
   padding: 1;
@@ -69,12 +54,12 @@ ListItem {
 }
 
 ListItem:hover {
-  background: var(--hover);
+  background: #222222;
 }
 
 ListItem:focus {
-  background: var(--selected);
-  color: var(--accent);
+  background: #444444;
+  color: #ffffff;
   text-style: bold;
 }
 
@@ -112,7 +97,7 @@ ListItem:focus {
 
 #tool-detail-name {
   text-style: bold;
-  color: var(--accent);
+  color: #ffffff;
   height: 3;
 }
 
@@ -122,8 +107,8 @@ ListItem:focus {
 }
 
 #run-tool-btn {
-  background: var(--accent);
-  color: var(--background);
+  background: #444444;
+  color: #ffffff;
   width: 30;
   height: 3;
   content-align: center middle;
@@ -131,7 +116,7 @@ ListItem:focus {
 }
 
 #run-tool-btn:hover {
-  background: var(--success);
+  background: #666666;
 }
 
 /* Vista de información */

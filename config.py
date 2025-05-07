@@ -21,23 +21,26 @@ KALI_TOOLS_DIRS = [
     "/usr/share/kali-menu/applications",
     "/usr/share/applications",
     "/usr/bin",
-    "/usr/local/bin"
+    "/usr/sbin",
+    "/usr/local/bin",
+    "/bin",
+    "/sbin"
 ]
 
 # Categorías y herramientas conocidas de Kali Linux
 TOOL_CATEGORIES = {
-    "information-gathering": ["nmap", "whois", "dig", "recon-ng", "maltego", "theharvester", "amass", "spiderfoot"],
-    "vulnerability-analysis": ["nikto", "nessus", "openvas", "lynis", "wpscan", "sqlmap", "legion", "sparta"],
-    "web-application": ["burpsuite", "owasp-zap", "skipfish", "wfuzz", "dirb", "dirbuster", "gobuster", "ffuf"],
-    "database-assessment": ["sqlmap", "sqlninja", "sqlsus", "oscanner", "sidguesser", "sqldict", "sqlbf"],
-    "password-attacks": ["hydra", "john", "hashcat", "medusa", "ncrack", "ophcrack", "rainbowcrack", "crunch"],
-    "wireless-attacks": ["aircrack-ng", "kismet", "wifite", "fern-wifi-cracker", "pixiewps", "reaver", "bully"],
-    "exploitation-tools": ["metasploit", "searchsploit", "beef", "armitage", "set", "routersploit", "commix"],
-    "sniffing-spoofing": ["wireshark", "ettercap", "bettercap", "dsniff", "netsniff-ng", "macchanger", "mitmproxy"],
-    "post-exploitation": ["empire", "weevely", "powersploit", "mimikatz", "proxychains", "veil", "shellter"],
-    "forensics": ["autopsy", "sleuthkit", "volatility", "foremost", "binwalk", "scalpel", "bulk-extractor"],
-    "reporting-tools": ["dradis", "faraday", "pipal", "metagoofil", "maltego", "casefile", "cherrytree"],
-    "social-engineering": ["social-engineer-toolkit", "beef", "maltego", "backdoor-factory", "gophish"],
-    "reverse-engineering": ["ghidra", "radare2", "apktool", "dex2jar", "jd-gui", "ollydbg", "gdb"],
+    "information-gathering": ["nmap", "whois", "dig", "recon-ng", "maltego", "theharvester"],
+    "vulnerability-analysis": ["nikto", "nessus", "openvas", "lynis", "wpscan", "sqlmap"],
+    "web-application": ["burpsuite", "owasp-zap", "skipfish", "wfuzz", "dirb", "dirbuster"],
+    "database-assessment": ["sqlmap", "sqlninja", "sqlsus", "oscanner", "sidguesser"],
+    "password-attacks": ["hydra", "john", "hashcat", "medusa", "ncrack", "ophcrack"],
+    "wireless-attacks": ["aircrack-ng", "kismet", "wifite", "fern-wifi-cracker", "pixiewps"],
+    "exploitation-tools": ["metasploit", "searchsploit", "beef", "armitage", "set"],
+    "sniffing-spoofing": ["wireshark", "ettercap", "bettercap", "dsniff", "netsniff-ng"],
+    "post-exploitation": ["empire", "weevely", "powersploit", "mimikatz", "proxychains"],
+    "forensics": ["autopsy", "sleuthkit", "volatility", "foremost", "binwalk"],
+    "reporting-tools": ["dradis", "faraday", "pipal", "metagoofil", "maltego"],
+    "social-engineering": ["social-engineer-toolkit", "beef", "maltego", "gophish"],
+    "reverse-engineering": ["ghidra", "radare2", "apktool", "dex2jar", "jd-gui"],
     "other-tools": []  # Categoría para herramientas que no encajan en las anteriores
 }

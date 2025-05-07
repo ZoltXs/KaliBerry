@@ -40,9 +40,12 @@ class CategoryView(Static):
     
     def get_selected(self) -> str:
         """Obtener la categoría seleccionada."""
-        selected = self.query_one("#category-list").highlighted
-        if selected and selected.id.startswith("category-"):
-            return selected.id.replace("category-", "")
+        try:
+            selected = self.query_one("#category-list").highlighted
+            if selected and selected.id and selected.id.startswith("category-"):
+                return selected.id.replace("category-", "")
+        except Exception as e:
+            print(f"Error al obtener categoría seleccionada: {e}")
         return ""
     
     def watch_display(self, display: bool) -> None:
@@ -139,9 +142,12 @@ class ToolView(Static):
     
     def get_selected(self) -> str:
         """Obtener la herramienta seleccionada."""
-        selected = self.query_one("#tool-list").highlighted
-        if selected and selected.id.startswith("tool-"):
-            return selected.id.replace("tool-", "")
+        try:
+            selected = self.query_one("#tool-list").highlighted
+            if selected and selected.id and selected.id.startswith("tool-"):
+                return selected.id.replace("tool-", "")
+        except Exception as e:
+            print(f"Error al obtener herramienta seleccionada: {e}")
         return ""
     
     def _format_category_name(self, category: str) -> str:

@@ -6,15 +6,17 @@ KaliBerry - CLI para herramientas de auditoría en Kali Linux
 import os
 import sys
 import signal
-import importlib.util
+import traceback
+from pathlib import Path
 
 # Configurar manejo de señales
 def signal_handler(sig, frame):
     """Manejar señales del sistema."""
     if sig == signal.SIGTSTP:
-        print("\nKaliBerry: Recibida señal de suspensión (SIGTSTP). Usa 'fg' para reanudar.")
+        print("\nKaliBerry: Ignorando señal SIGTSTP")
+        return
     elif sig == signal.SIGINT:
-        print("\nKaliBerry: Saliendo por señal de interrupción (SIGINT).")
+        print("\nKaliBerry: Saliendo...")
         sys.exit(0)
 
 # Registrar manejadores de señales
@@ -27,15 +29,14 @@ try:
 except ImportError:
     print("Error: La biblioteca 'textual' no está instalada.")
     print("Por favor, instálela con:")
-    print("sudo pip3 install --break-system-packages textual")
+    print("sudo pip3 install textual")
     sys.exit(1)
 
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Button, Static, ListView, ListItem
-from textual.containers import Container, Horizontal, Vertical
+from textual.containers import Container
 from textual.reactive import reactive
 from textual.binding import Binding
-from textual import events
 
 # Verificar que podemos importar los módulos necesarios
 try:
@@ -88,10 +89,11 @@ class KaliBerryApp(App):
     def __init__(self):
         super().__init__()
         try:
+            print("Inicializando KaliBerry...")
             self.tool_manager = ToolManager()
+            print("Gestor de herramientas inicializado correctamente.")
         except Exception as e:
             print(f"Error al inicializar el gestor de herramientas: {e}")
-            import traceback
             traceback.print_exc()
             sys.exit(1)
     
@@ -108,64 +110,86 @@ class KaliBerryApp(App):
     
     def on_mount(self) -> None:
         """Evento que se ejecuta al montar la aplicación."""
-        self.query_one(CategoryView).display = True
-        self.query_one(ToolView).display = False
-        self.query_one(AboutView).display = False
+        try:
+            print("Montando la aplicación...")
+            self.query_one(CategoryView).display = True
+            self.query_one(ToolView).display = False
+            self.query_one(AboutView).display = False
+            print("Aplicación montada correctamente.")
+        except Exception as e:
+            print(f"Error al montar la aplicación: {e}")
+            traceback.print_exc()
     
     def action_home(self) -> None:
         """Volver al menú principal."""
-        self.current_view = "main"
-        self.query_one(CategoryView).display = True
-        self.query_one(ToolView).display = False
-        self.query_one(AboutView).display = False
-    
-    def action_back(self) -> None:
-        """Volver a la vista anterior."""
-        if self.current_view == "tools":
+        try:
             self.current_view = "main"
             self.query_one(CategoryView).display = True
             self.query_one(ToolView).display = False
-        elif self.current_view == "tool_detail":
-            self.current_view = "tools"
-            self.query_one(ToolView).show_tools_list()
+            self.query_one(AboutView).display = False
+        except Exception as e:
+            print(f"Error al volver al menú principal: {e}")
+    
+    def action_back(self) -> None:
+        """Volver a la vista anterior."""
+        try:
+            if self.current_view == "tools":
+                self.current_view = "main"
+                self.query_one(CategoryView).display = True
+                self.query_one(ToolView).display = False
+            elif self.current_view == "tool_detail":
+                self.current_view = "tools"
+                self.query_one(ToolView).show_tools_list()
+        except Exception as e:
+            print(f"Error al volver a la vista anterior: {e}")
     
     def action_select(self) -> None:
         """Seleccionar el elemento actual."""
-        if self.current_view == "main":
-            selected = self.query_one(CategoryView).get_selected()
-            if selected == "about":
-                self.current_view = "about"
-                self.query_one(CategoryView).display = False
-                self.query_one(AboutView).display = True
-            else:
-                self.selected_category = selected
-                self.current_view = "tools"
-                self.query_one(CategoryView).display = False
-                self.query_one(ToolView).display = True
-                self.query_one(ToolView).show_category(selected)
-        elif self.current_view == "tools":
-            selected = self.query_one(ToolView).get_selected()
-            if selected:
-                self.selected_tool = selected
-                self.current_view = "tool_detail"
-                self.query_one(ToolView).show_tool_detail(selected)
-        elif self.current_view == "tool_detail":
-            self.tool_manager.launch_tool(self.selected_tool)
+        try:
+            if self.current_view == "main":
+                selected = self.query_one(CategoryView).get_selected()
+                if selected == "about":
+                    self.current_view = "about"
+                    self.query_one(CategoryView).display = False
+                    self.query_one(AboutView).display = True
+                else:
+                    self.selected_category = selected
+                    self.current_view = "tools"
+                    self.query_one(CategoryView).display = False
+                    self.query_one(ToolView).display = True
+                    self.query_one(ToolView).show_category(selected)
+            elif self.current_view == "tools":
+                selected = self.query_one(ToolView).get_selected()
+                if selected:
+                    self.selected_tool = selected
+                    self.current_view = "tool_detail"
+                    self.query_one(ToolView).show_tool_detail(selected)
+            elif self.current_view == "tool_detail":
+                self.tool_manager.launch_tool(self.selected_tool)
+        except Exception as e:
+            print(f"Error al seleccionar elemento: {e}")
     
     def on_button_pressed(self, event) -> None:
         """Manejar eventos de botones."""
-        button_id = event.button.id
-        if button_id == "run-tool-btn" and self.selected_tool:
-            self.tool_manager.launch_tool(self.selected_tool)
+        try:
+            button_id = event.button.id
+            if button_id == "run-tool-btn" and self.selected_tool:
+                self.tool_manager.launch_tool(self.selected_tool)
+        except Exception as e:
+            print(f"Error al manejar evento de botón: {e}")
 
 def main():
     """Función principal."""
     try:
+        print("Iniciando KaliBerry...")
+        # Ignorar la señal SIGTSTP para evitar que el proceso se detenga
+        signal.signal(signal.SIGTSTP, signal_handler)
+        
+        # Crear y ejecutar la aplicación
         app = KaliBerryApp()
         app.run()
     except Exception as e:
         print(f"Error al ejecutar KaliBerry: {e}")
-        import traceback
         traceback.print_exc()
         sys.exit(1)
 
