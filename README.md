@@ -18,23 +18,81 @@ KaliBerry es una interfaz de línea de comandos (CLI) para Kali Linux que facili
 - Python 3.7 o superior
 - Biblioteca Textual para Python
 
-## Instalación
+## Guía de Instalación para Principiantes
 
-1. Clone el repositorio:
-   \`\`\`bash
-   git clone https://github.com/yourusername/kaliBerry.git
-   cd kaliBerry
-   \`\`\`
+### Paso 1: Abrir la Terminal
 
-2. Instale las dependencias:
-   \`\`\`bash
-   pip3 install --break-system-packages textual
-   \`\`\`
+Primero, necesitas abrir una terminal en tu sistema Kali Linux:
+- Haz clic en el icono de la terminal en la barra de tareas, o
+- Presiona `Ctrl+Alt+T` en tu teclado
 
-3. Ejecute KaliBerry:
-   \`\`\`bash
-   python3 kaliBerry.py
-   \`\`\`
+### Paso 2: Descargar KaliBerry
+
+Copia y pega los siguientes comandos en la terminal, presionando Enter después de cada uno:
+
+\`\`\`bash
+# Descargar KaliBerry
+git clone https://github.com/yourusername/kaliBerry.git
+
+# Entrar al directorio de KaliBerry
+cd kaliBerry
+\`\`\`
+
+### Paso 3: Instalar Dependencias
+
+KaliBerry necesita la biblioteca Textual para funcionar. Instálala con este comando:
+
+\`\`\`bash
+# Instalar la biblioteca Textual
+pip3 install --break-system-packages textual
+\`\`\`
+
+Si ves algún mensaje de error, prueba con este comando alternativo:
+
+\`\`\`bash
+# Alternativa para instalar Textual
+sudo pip3 install textual
+\`\`\`
+
+### Paso 4: Ejecutar KaliBerry
+
+Ahora puedes ejecutar KaliBerry directamente:
+
+\`\`\`bash
+# Ejecutar KaliBerry
+python3 kaliBerry.py
+\`\`\`
+
+### Paso 5 (Opcional): Crear un Acceso Directo
+
+Para poder ejecutar KaliBerry desde cualquier ubicación, puedes crear un acceso directo:
+
+\`\`\`bash
+# Hacer el archivo ejecutable
+chmod +x kaliBerry.py
+
+# Crear un enlace en /usr/local/bin (requiere permisos de administrador)
+sudo ln -s "$(pwd)/kaliBerry.py" /usr/local/bin/kaliBerry
+\`\`\`
+
+Después de este paso, podrás iniciar KaliBerry simplemente escribiendo `kaliBerry` en cualquier terminal.
+
+### Solución de Problemas Comunes
+
+1. **Error "Permission denied"**: 
+   - Asegúrate de tener permisos para ejecutar el archivo con `chmod +x kaliBerry.py`
+
+2. **Error "Command not found"**:
+   - Verifica que estás en el directorio correcto con `pwd`
+   - Asegúrate de escribir correctamente el comando: `python3 kaliBerry.py`
+
+3. **Error al instalar Textual**:
+   - Intenta actualizar pip: `pip3 install --upgrade pip`
+   - Luego vuelve a intentar instalar Textual
+
+4. **No se muestran herramientas**:
+   - Ejecuta KaliBerry con permisos de administrador: `sudo kaliBerry`
+   - Esto puede ser necesario la primera vez para detectar todas las herramientas
 
 ## Uso
 
