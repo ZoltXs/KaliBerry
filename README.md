@@ -18,81 +18,56 @@ KaliBerry es una interfaz de línea de comandos (CLI) para Kali Linux que facili
 - Python 3.7 o superior
 - Biblioteca Textual para Python
 
-## Guía de Instalación para Principiantes
+## Instalación
 
-### Paso 1: Abrir la Terminal
+### Instalación Manual
 
-Primero, necesitas abrir una terminal en tu sistema Kali Linux:
-- Haz clic en el icono de la terminal en la barra de tareas, o
-- Presiona `Ctrl+Alt+T` en tu teclado
+1. Clone el repositorio:
+   \`\`\`bash
+   git clone https://github.com/yourusername/kaliBerry.git
+   cd kaliBerry
+   \`\`\`
 
-### Paso 2: Descargar KaliBerry
+2. Instale las dependencias:
+   \`\`\`bash
+   pip3 install --break-system-packages textual
+   \`\`\`
 
-Copia y pega los siguientes comandos en la terminal, presionando Enter después de cada uno:
+3. Ejecute KaliBerry:
+   \`\`\`bash
+   python3 kaliBerry.py
+   \`\`\`
 
-\`\`\`bash
-# Descargar KaliBerry
-git clone https://github.com/yourusername/kaliBerry.git
+### Instalación para Todo el Sistema
 
-# Entrar al directorio de KaliBerry
-cd kaliBerry
-\`\`\`
+Para instalar KaliBerry en todo el sistema y poder ejecutarlo desde cualquier ubicación:
 
-### Paso 3: Instalar Dependencias
+1. Clone el repositorio:
+   \`\`\`bash
+   git clone https://github.com/yourusername/kaliBerry.git
+   \`\`\`
 
-KaliBerry necesita la biblioteca Textual para funcionar. Instálala con este comando:
+2. Instale las dependencias:
+   \`\`\`bash
+   pip3 install --break-system-packages textual
+   \`\`\`
 
-\`\`\`bash
-# Instalar la biblioteca Textual
-pip3 install --break-system-packages textual
-\`\`\`
+3. Copie los archivos a /opt:
+   \`\`\`bash
+   sudo mkdir -p /opt/kaliBerry
+   sudo cp -r kaliBerry/* /opt/kaliBerry/
+   \`\`\`
 
-Si ves algún mensaje de error, prueba con este comando alternativo:
+4. Cree un enlace simbólico:
+   \`\`\`bash
+   sudo ln -s /opt/kaliBerry/kaliBerry.py /usr/local/bin/kaliBerry
+   sudo chmod +x /opt/kaliBerry/kaliBerry.py
+   \`\`\`
 
-\`\`\`bash
-# Alternativa para instalar Textual
-sudo pip3 install textual
-\`\`\`
-
-### Paso 4: Ejecutar KaliBerry
-
-Ahora puedes ejecutar KaliBerry directamente:
-
-\`\`\`bash
-# Ejecutar KaliBerry
-python3 kaliBerry.py
-\`\`\`
-
-### Paso 5 (Opcional): Crear un Acceso Directo
-
-Para poder ejecutar KaliBerry desde cualquier ubicación, puedes crear un acceso directo:
-
-\`\`\`bash
-# Hacer el archivo ejecutable
-chmod +x kaliBerry.py
-
-# Crear un enlace en /usr/local/bin (requiere permisos de administrador)
-sudo ln -s "$(pwd)/kaliBerry.py" /usr/local/bin/kaliBerry
-\`\`\`
-
-Después de este paso, podrás iniciar KaliBerry simplemente escribiendo `kaliBerry` en cualquier terminal.
-
-### Solución de Problemas Comunes
-
-1. **Error "Permission denied"**: 
-   - Asegúrate de tener permisos para ejecutar el archivo con `chmod +x kaliBerry.py`
-
-2. **Error "Command not found"**:
-   - Verifica que estás en el directorio correcto con `pwd`
-   - Asegúrate de escribir correctamente el comando: `python3 kaliBerry.py`
-
-3. **Error al instalar Textual**:
-   - Intenta actualizar pip: `pip3 install --upgrade pip`
-   - Luego vuelve a intentar instalar Textual
-
-4. **No se muestran herramientas**:
-   - Ejecuta KaliBerry con permisos de administrador: `sudo kaliBerry`
-   - Esto puede ser necesario la primera vez para detectar todas las herramientas
+5. Ejecute KaliBerry desde cualquier ubicación:
+   \`\`\`bash
+   kaliBerry
+   \`\`\`
 
 ## Uso
 
@@ -102,6 +77,37 @@ Después de este paso, podrás iniciar KaliBerry simplemente escribiendo `kaliBe
 - Presione `h` para volver al menú principal.
 - Presione `q` para salir de la aplicación.
 - Presione `?` para mostrar la ayuda.
+
+## Solución de Problemas
+
+### No se muestran herramientas
+
+Si KaliBerry no muestra herramientas, puede ser debido a un problema con el caché. Para solucionarlo:
+
+1. Elimine el archivo de caché:
+   \`\`\`bash
+   rm -f ~/.config/kaliBerry/tools_cache.json
+   \`\`\`
+
+2. Ejecute KaliBerry nuevamente:
+   \`\`\`bash
+   kaliBerry
+   \`\`\`
+
+### Proceso Suspendido
+
+Si ve el mensaje "[1]+ Detenido kaliBerry", significa que el proceso ha sido suspendido. Para reanudarlo:
+
+\`\`\`bash
+fg
+\`\`\`
+
+O para terminar el proceso y reiniciar:
+
+\`\`\`bash
+killall -9 python3
+kaliBerry
+\`\`\`
 
 ## Personalización
 

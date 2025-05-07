@@ -31,7 +31,6 @@ TOOL_CATEGORIES = {
     "web-application": ["burpsuite", "owasp-zap", "skipfish", "wfuzz", "dirb", "dirbuster", "gobuster", "ffuf"],
     "database-assessment": ["sqlmap", "sqlninja", "sqlsus", "oscanner", "sidguesser", "sqldict", "sqlbf"],
     "password-attacks": ["hydra", "john", "hashcat", "medusa", "ncrack", "ophcrack", "rainbowcrack", "crunch"],
-    "  ["hydra", "john", "hashcat", "medusa", "ncrack", "ophcrack", "rainbowcrack", "crunch"],
     "wireless-attacks": ["aircrack-ng", "kismet", "wifite", "fern-wifi-cracker", "pixiewps", "reaver", "bully"],
     "exploitation-tools": ["metasploit", "searchsploit", "beef", "armitage", "set", "routersploit", "commix"],
     "sniffing-spoofing": ["wireshark", "ettercap", "bettercap", "dsniff", "netsniff-ng", "macchanger", "mitmproxy"],

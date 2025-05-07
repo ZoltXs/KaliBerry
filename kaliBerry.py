@@ -5,7 +5,21 @@ KaliBerry - CLI para herramientas de auditoría en Kali Linux
 
 import os
 import sys
+import signal
 import importlib.util
+
+# Configurar manejo de señales
+def signal_handler(sig, frame):
+    """Manejar señales del sistema."""
+    if sig == signal.SIGTSTP:
+        print("\nKaliBerry: Recibida señal de suspensión (SIGTSTP). Usa 'fg' para reanudar.")
+    elif sig == signal.SIGINT:
+        print("\nKaliBerry: Saliendo por señal de interrupción (SIGINT).")
+        sys.exit(0)
+
+# Registrar manejadores de señales
+signal.signal(signal.SIGTSTP, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
 
 # Verificar si textual está instalado
 try:
@@ -138,7 +152,7 @@ class KaliBerryApp(App):
         elif self.current_view == "tool_detail":
             self.tool_manager.launch_tool(self.selected_tool)
     
-    def on_button_pressed(self, event: events.Button.Pressed) -> None:
+    def on_button_pressed(self, event) -> None:
         """Manejar eventos de botones."""
         button_id = event.button.id
         if button_id == "run-tool-btn" and self.selected_tool:

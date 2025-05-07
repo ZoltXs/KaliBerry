@@ -22,46 +22,104 @@ class ToolManager:
     
     def load_tools(self) -> None:
         """Cargar las herramientas desde el caché o detectarlas."""
-        if os.path.exists(TOOLS_CACHE_FILE):
-            try:
-                with open(TOOLS_CACHE_FILE, 'r') as f:
-                    self.tools = json.load(f)
-                # Verificar si hay nuevas herramientas
-                self.detect_new_tools()
-            except Exception as e:
-                print(f"Error al cargar el caché: {e}")
+        # Inicializar con categorías vacías
+        self.tools = {category: [] for category in self.categories}
+        
+        try:
+            # Asegurarse de que el directorio de caché existe
+            os.makedirs(os.path.dirname(TOOLS_CACHE_FILE), exist_ok=True)
+            
+            # Intentar cargar desde el caché
+            if os.path.exists(TOOLS_CACHE_FILE):
+                try:
+                    with open(TOOLS_CACHE_FILE, 'r') as f:
+                        cache_data = json.load(f)
+                        # Verificar que el caché tiene el formato correcto
+                        if isinstance(cache_data, dict):
+                            self.tools.update(cache_data)
+                except Exception as e:
+                    print(f"Error al cargar el caché: {e}")
+                    # En caso de error, usar herramientas predefinidas
+                    self._initialize_with_predefined_tools()
+            else:
+                # Si no existe el caché, usar herramientas predefinidas
+                self._initialize_with_predefined_tools()
+                # Intentar detectar más herramientas
                 self.detect_tools()
-        else:
-            self.detect_tools()
+        except Exception as e:
+            print(f"Error al inicializar: {e}")
+            # En caso de cualquier error, usar herramientas predefinidas
+            self._initialize_with_predefined_tools()
+    
+    def _initialize_with_predefined_tools(self) -> None:
+        """Inicializar con herramientas predefinidas."""
+        # Herramientas básicas que deberían estar en cualquier sistema
+        common_tools = {
+            "information-gathering": [
+                {"name": "nmap", "description": "Herramienta de escaneo de redes", "command": "nmap"},
+                {"name": "whois", "description": "Cliente whois para consultar información de dominios", "command": "whois"},
+                {"name": "dig", "description": "Herramienta de consulta DNS", "command": "dig"}
+            ],
+            "vulnerability-analysis": [
+                {"name": "nikto", "description": "Escáner de vulnerabilidades web", "command": "nikto"}
+            ],
+            "web-application": [
+                {"name": "dirb", "description": "Escáner de directorios web", "command": "dirb"}
+            ],
+            "password-attacks": [
+                {"name": "john", "description": "John the Ripper - Herramienta de cracking de contraseñas", "command": "john"}
+            ],
+            "other-tools": [
+                {"name": "vim", "description": "Editor de texto avanzado", "command": "vim"},
+                {"name": "git", "description": "Sistema de control de versiones", "command": "git"},
+                {"name": "tmux", "description": "Multiplexor de terminal", "command": "tmux"}
+            ]
+        }
+        
+        # Añadir herramientas predefinidas a las categorías
+        for category, tools_list in common_tools.items():
+            if category in self.tools:
+                for tool in tools_list:
+                    # Verificar si la herramienta existe en el sistema
+                    if self._command_exists(tool["command"]):
+                        # Evitar duplicados
+                        if not any(t["name"] == tool["name"] for t in self.tools[category]):
+                            self.tools[category].append(tool)
+        
+        # Intentar guardar en caché
+        try:
+            self._save_cache()
+        except Exception as e:
+            print(f"Error al guardar el caché inicial: {e}")
     
     def detect_tools(self) -> None:
         """Detectar todas las herramientas de Kali Linux."""
-        self.tools = {category: [] for category in self.categories}
-        
-        # Método 1: Detectar herramientas usando which para comandos conocidos
-        for category, tools_list in TOOL_CATEGORIES.items():
-            for tool in tools_list:
-                if self._command_exists(tool):
-                    description = self._get_tool_description(tool)
-                    self.tools[category].append({
-                        "name": tool,
-                        "description": description,
-                        "command": tool
-                    })
-        
-        # Método 2: Buscar archivos .desktop en directorios de aplicaciones de Kali
-        for directory in KALI_TOOLS_DIRS:
-            if os.path.exists(directory) and os.path.isdir(directory):
-                self._scan_directory_for_tools(directory)
-        
-        # Método 3: Usar apt para listar paquetes de Kali instalados
-        self._detect_kali_packages()
-        
-        # Método 4: Añadir herramientas predefinidas si no se encontraron suficientes
-        self._add_predefined_tools()
-        
-        # Guardar en caché
-        self._save_cache()
+        try:
+            # Método 1: Detectar herramientas usando which para comandos conocidos
+            for category, tools_list in TOOL_CATEGORIES.items():
+                for tool in tools_list:
+                    if self._command_exists(tool):
+                        description = self._get_tool_description(tool)
+                        # Evitar duplicados
+                        if not any(t["name"] == tool for t in self.tools[category]):
+                            self.tools[category].append({
+                                "name": tool,
+                                "description": description,
+                                "command": tool
+                            })
+            
+            # Método 2: Buscar archivos .desktop en directorios de aplicaciones de Kali
+            for directory in KALI_TOOLS_DIRS:
+                if os.path.exists(directory) and os.path.isdir(directory):
+                    self._scan_directory_for_tools(directory)
+            
+            # Método 3: Usar apt para listar paquetes de Kali instalados
+            self._detect_kali_packages()
+            
+            # Guardar en caché
+            self._save_cache()
+        except Exception as e:
+            print(f"Error al detectar herramientas: {e}")
     
     def _command_exists(self, command: str) -> bool:
         """Verificar si un comando existe en el sistema."""
@@ -77,7 +135,9 @@ class ToolManager:
                         tool_info = self._parse_desktop_file(desktop_file)
                         if tool_info:
                             category = self._categorize_tool(tool_info["name"], tool_info["description"])
-                            self.tools[category].append(tool_info)
+                            # Evitar duplicados
+                            if not any(t["name"] == tool_info["name"] for t in self.tools[category]):
+                                self.tools[category].append(tool_info)
         except Exception as e:
             print(f"Error al escanear directorio {directory}: {e}")
     
@@ -144,47 +204,9 @@ class ToolManager:
         except Exception as e:
             print(f"Error al detectar paquetes de Kali: {e}")
     
-    def _add_predefined_tools(self) -> None:
-        """Añadir herramientas predefinidas si no se encontraron suficientes."""
-        # Verificar si hay suficientes herramientas
-        total_tools = sum(len(tools) for tools in self.tools.values())
-        if total_tools < 10:  # Si hay menos de 10 herramientas en total
-            # Herramientas comunes que deberían estar en cualquier sistema Linux
-            common_tools = {
-                "information-gathering": [
-                    {"name": "nmap", "description": "Herramienta de escaneo de redes", "command": "nmap"},
-                    {"name": "whois", "description": "Cliente whois para consultar información de dominios", "command": "whois"},
-                    {"name": "dig", "description": "Herramienta de consulta DNS", "command": "dig"}
-                ],
-                "vulnerability-analysis": [
-                    {"name": "nikto", "description": "Escáner de vulnerabilidades web", "command": "nikto"}
-                ],
-                "web-application": [
-                    {"name": "dirb", "description": "Escáner de directorios web", "command": "dirb"}
-                ],
-                "password-attacks": [
-                    {"name": "john", "description": "John the Ripper - Herramienta de cracking de contraseñas", "command": "john"}
-                ],
-                "other-tools": [
-                    {"name": "vim", "description": "Editor de texto avanzado", "command": "vim"},
-                    {"name": "git", "description": "Sistema de control de versiones", "command": "git"},
-                    {"name": "tmux", "description": "Multiplexor de terminal", "command": "tmux"}
-                ]
-            }
-            
-            # Añadir herramientas predefinidas a las categorías
-            for category, tools_list in common_tools.items():
-                for tool in tools_list:
-                    # Verificar si la herramienta existe en el sistema
-                    if self._command_exists(tool["command"]):
-                        # Evitar duplicados
-                        if not any(t["name"] == tool["name"] for t in self.tools[category]):
-                            self.tools[category].append(tool)
-    
     def detect_new_tools(self) -> None:
         """Detectar nuevas herramientas que no estén en el caché."""
         # Por simplicidad, volvemos a detectar todas las herramientas
-        # En una implementación más eficiente, solo detectaríamos las nuevas
         self.detect_tools()
     
     def _categorize_tool(self, tool_name: str, description: str = "") -> str:
@@ -283,9 +305,16 @@ class ToolManager:
     def _save_cache(self) -> None:
         """Guardar las herramientas en caché."""
         try:
+            # Asegurarse de que el directorio existe
             os.makedirs(os.path.dirname(TOOLS_CACHE_FILE), exist_ok=True)
+            
+            # Guardar el caché
             with open(TOOLS_CACHE_FILE, 'w') as f:
                 json.dump(self.tools, f, indent=2)
+                
+            # Verificar que el archivo se guardó correctamente
+            if not os.path.exists(TOOLS_CACHE_FILE) or os.path.getsize(TOOLS_CACHE_FILE) == 0:
+                print("Advertencia: El archivo de caché parece estar vacío o no se guardó correctamente.")
         except Exception as e:
             print(f"Error al guardar el caché: {e}")
     
