@@ -1,0 +1,145 @@
+/* Estilos para KaliBerry */
+
+/* Variables globales */
+:root {
+  --background: #121212;
+  --foreground: #f0f0f0;
+  --primary: #ff79c6;
+  --secondary: #bd93f9;
+  --accent: #50fa7b;
+  --warning: #ffb86c;
+  --error: #ff5555;
+  --success: #50fa7b;
+  --border: #44475a;
+  --selected: #44475a;
+  --hover: #282a36;
+}
+
+/* Estilos generales */
+Screen {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Encabezado */
+Header {
+  background: var(--primary);
+  color: var(--background);
+  text-style: bold;
+  dock: top;
+  height: 1;
+}
+
+/* Pie de página */
+Footer {
+  background: var(--secondary);
+  color: var(--background);
+  dock: bottom;
+  height: 1;
+}
+
+/* Contenedor principal */
+#main-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Título */
+#title,
+#tool-title,
+#about-title {
+  background: var(--secondary);
+  color: var(--background);
+  width: 100%;
+  height: 3;
+  content-align: center middle;
+  text-style: bold;
+}
+
+/* Listas */
+ListView {
+  border: solid var(--border);
+  width: 100%;
+  height: 100%;
+  padding: 1;
+}
+
+ListItem {
+  padding: 1 2;
+}
+
+ListItem:hover {
+  background: var(--hover);
+}
+
+ListItem:focus {
+  background: var(--selected);
+  color: var(--accent);
+  text-style: bold;
+}
+
+/* Vistas */
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Vista de categorías */
+#category-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Vista de herramientas */
+#tool-container {
+  width: 100%;
+  height: 100%;
+}
+
+#tool-list-container {
+  width: 100%;
+  height: 100%;
+}
+
+#tool-detail-container {
+  width: 100%;
+  height: 100%;
+  padding: 2;
+}
+
+#tool-detail-name {
+  text-style: bold;
+  color: var(--accent);
+  height: 3;
+}
+
+#tool-detail-description {
+  height: auto;
+  margin-bottom: 2;
+}
+
+#run-tool-btn {
+  background: var(--accent);
+  color: var(--background);
+  width: 30;
+  height: 3;
+  content-align: center middle;
+  text-style: bold;
+}
+
+#run-tool-btn:hover {
+  background: var(--success);
+}
+
+/* Vista de información */
+#about-container {
+  width: 100%;
+  height: 100%;
+}
+
+#about-content {
+  padding: 2;
+}
