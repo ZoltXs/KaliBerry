@@ -23,11 +23,6 @@ show_error() {
     echo -e "${RED}[✗] $1${NC}"
 }
 
-# Función para verificar si un comando existe
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
 echo "====================================================="
 echo "      Instalador Automático de KaliBerry v1.0        "
 echo "====================================================="
@@ -44,25 +39,31 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Eliminar instalación anterior
+show_status "Eliminando instalación anterior (si existe)..."
+rm -rf /opt/kaliBerry
+rm -f /usr/local/bin/kaliBerry
+rm -rf ~/.config/kaliBerry
+
 # Crear directorio de instalación
-echo -e "${GREEN}Creando directorio de instalación...${NC}"
+show_status "Creando directorio de instalación..."
 mkdir -p /opt/kaliBerry
 
 # Copiar archivos
-echo -e "${GREEN}Copiando archivos...${NC}"
+show_status "Copiando archivos..."
 cp kaliBerry.py tool_manager.py config.py ui_manager.py styles.css /opt/kaliBerry/
 
 # Establecer permisos
-echo -e "${GREEN}Estableciendo permisos...${NC}"
+show_status "Estableciendo permisos..."
 chmod 755 /opt/kaliBerry/*.py
 chmod 644 /opt/kaliBerry/styles.css
 
 # Crear directorio de configuración
-echo -e "${GREEN}Creando directorio de configuración...${NC}"
+show_status "Creando directorio de configuración..."
 mkdir -p ~/.config/kaliBerry
 
 # Crear script ejecutable
-echo -e "${GREEN}Creando script ejecutable...${NC}"
+show_status "Creando script ejecutable..."
 cat > /usr/local/bin/kaliBerry << 'EOF'
 #!/bin/bash
 cd /opt/kaliBerry
@@ -71,7 +72,11 @@ EOF
 
 chmod 755 /usr/local/bin/kaliBerry
 
-echo -e "${GREEN}¡Instalación completada!${NC}"
+# Instalar dependencias
+show_status "Instalando dependencias..."
+pip3 install textual
+
+show_status "¡Instalación completada!"
 echo ""
 echo "Ahora puedes ejecutar KaliBerry escribiendo:"
 echo ""

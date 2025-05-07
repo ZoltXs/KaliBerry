@@ -32,7 +32,8 @@ Footer {
 /* Título */
 #title,
 #tool-title,
-#about-title {
+#about-title,
+#add-tool-title {
   background: #333333;
   color: #ffffff;
   width: 100%;
@@ -106,16 +107,49 @@ ListItem:focus {
   margin-bottom: 2;
 }
 
-#run-tool-btn {
-  background: #444444;
-  color: #ffffff;
-  width: 30;
+/* Vista para añadir herramientas */
+#add-tool-container {
+  width: 100%;
+  height: 100%;
+}
+
+#add-tool-form {
+  padding: 2;
+}
+
+Input {
+  width: 100%;
+  margin-bottom: 1;
+}
+
+Select {
+  width: 100%;
+  margin-bottom: 1;
+}
+
+#add-tool-buttons {
+  margin-top: 2;
+  width: 100%;
   height: 3;
-  content-align: center middle;
+}
+
+#add-tool-status {
+  margin-top: 2;
+  color: #00ff00;
   text-style: bold;
 }
 
-#run-tool-btn:hover {
+Button {
+  background: #444444;
+  color: #ffffff;
+  min-width: 20;
+  height: 3;
+  content-align: center middle;
+  text-style: bold;
+  margin-right: 1;
+}
+
+Button:hover {
   background: #666666;
 }
 

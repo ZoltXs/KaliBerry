@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script para corregir la instalación de KaliBerry
+# Script para arreglar KaliBerry de una vez por todas
 
 # Colores para los mensajes
 GREEN='\033[0;32m'
@@ -7,120 +7,134 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # Sin Color
 
-# Función para mostrar mensajes de progreso
-show_status() {
-    echo -e "${GREEN}[✓] $1${NC}"
-}
-
-# Función para mostrar advertencias
-show_warning() {
-    echo -e "${YELLOW}[!] $1${NC}"
-}
-
-# Función para mostrar errores
-show_error() {
-    echo -e "${RED}[✗] $1${NC}"
-}
-
-echo "====================================================="
-echo "      Reparación de KaliBerry                        "
-echo "====================================================="
+echo -e "${GREEN}=== Arreglando KaliBerry de una vez por todas ===${NC}"
 echo ""
 
-# Verificar si se está ejecutando como root
-if [ "$EUID" -ne 0 ]; then
-    show_error "Este script debe ejecutarse como root (sudo)."
-    exit 1
-fi
+# Eliminar todo lo anterior
+echo -e "${YELLOW}Eliminando instalación anterior...${NC}"
+sudo rm -rf /opt/kaliBerry
+sudo rm -f /usr/local/bin/kaliBerry
+rm -rf ~/.config/kaliBerry
 
-# Ubicación de la instalación
-INSTALL_DIR="/opt/kaliBerry"
+# Crear directorios
+echo -e "${YELLOW}Creando directorios...${NC}"
+sudo mkdir -p /opt/kaliBerry
+mkdir -p ~/.config/kaliBerry
 
-# Verificar si KaliBerry está instalado
-if [ ! -d "$INSTALL_DIR" ]; then
-    show_error "KaliBerry no está instalado en $INSTALL_DIR."
-    exit 1
-fi
-
-# Corregir el archivo config.py
-echo "Corrigiendo el archivo config.py..."
-
-cat > "$INSTALL_DIR/config.py" << 'EOF'
-#!/usr/bin/env python3
-"""
-Configuración para KaliBerry
-"""
-
-import os
-from pathlib import Path
-
-# Información de la aplicación
-TITLE = "KaliBerry"
-VERSION = "1.0.0"
-THEME = "dark"
-
-# Directorios y archivos
-HOME_DIR = str(Path.home())
-CONFIG_DIR = os.path.join(HOME_DIR, ".config", "kaliBerry")
-TOOLS_CACHE_FILE = os.path.join(CONFIG_DIR, "tools_cache.json")
-
-# Directorios donde buscar herramientas de Kali
-KALI_TOOLS_DIRS = [
-    "/usr/share/kali-menu/applications",
-    "/usr/share/applications",
-    "/usr/bin",
-    "/usr/local/bin"
-]
-
-# Categorías y herramientas conocidas de Kali Linux
-TOOL_CATEGORIES = {
-    "information-gathering": ["nmap", "whois", "dig", "recon-ng", "maltego", "theharvester", "amass", "spiderfoot"],
-    "vulnerability-analysis": ["nikto", "nessus", "openvas", "lynis", "wpscan", "sqlmap", "legion", "sparta"],
-    "web-application": ["burpsuite", "owasp-zap", "skipfish", "wfuzz", "dirb", "dirbuster", "gobuster", "ffuf"],
-    "database-assessment": ["sqlmap", "sqlninja", "sqlsus", "oscanner", "sidguesser", "sqldict", "sqlbf"],
-    "password-attacks": ["hydra", "john", "hashcat", "medusa", "ncrack", "ophcrack", "rainbowcrack", "crunch"],
-    "wireless-attacks": ["aircrack-ng", "kismet", "wifite", "fern-wifi-cracker", "pixiewps", "reaver", "bully"],
-    "exploitation-tools": ["metasploit", "searchsploit", "beef", "armitage", "set", "routersploit", "commix"],
-    "sniffing-spoofing": ["wireshark", "ettercap", "bettercap", "dsniff", "netsniff-ng", "macchanger", "mitmproxy"],
-    "post-exploitation": ["empire", "weevely", "powersploit", "mimikatz", "proxychains", "veil", "shellter"],
-    "forensics": ["autopsy", "sleuthkit", "volatility", "foremost", "binwalk", "scalpel", "bulk-extractor"],
-    "reporting-tools": ["dradis", "faraday", "pipal", "metagoofil", "maltego", "casefile", "cherrytree"],
-    "social-engineering": ["social-engineer-toolkit", "beef", "maltego", "backdoor-factory", "gophish"],
-    "reverse-engineering": ["ghidra", "radare2", "apktool", "dex2jar", "jd-gui", "ollydbg", "gdb"],
-    "other-tools": []  # Categoría para herramientas que no encajan en las anteriores
+# Crear caché de herramientas mínimo
+echo -e "${YELLOW}Creando caché de herramientas mínimo...${NC}"
+cat > ~/.config/kaliBerry/tools_cache.json << 'EOF'
+{
+  "information-gathering": [
+    {
+      "name": "nmap",
+      "description": "Herramienta de escaneo de redes",
+      "command": "/usr/bin/nmap"
+    },
+    {
+      "name": "whois",
+      "description": "Cliente whois para consultar información de dominios",
+      "command": "/usr/bin/whois"
+    },
+    {
+      "name": "dig",
+      "description": "Herramienta de consulta DNS",
+      "command": "/usr/bin/dig"
+    }
+  ],
+  "vulnerability-analysis": [
+    {
+      "name": "nikto",
+      "description": "Escáner de vulnerabilidades web",
+      "command": "/usr/bin/nikto"
+    }
+  ],
+  "web-application": [
+    {
+      "name": "dirb",
+      "description": "Escáner de directorios web",
+      "command": "/usr/bin/dirb"
+    },
+    {
+      "name": "sqlmap",
+      "description": "Herramienta de detección y explotación de inyección SQL",
+      "command": "/usr/bin/sqlmap"
+    }
+  ],
+  "password-attacks": [
+    {
+      "name": "john",
+      "description": "John the Ripper - Herramienta de cracking de contraseñas",
+      "command": "/usr/bin/john"
+    },
+    {
+      "name": "hydra",
+      "description": "Herramienta de fuerza bruta para múltiples servicios",
+      "command": "/usr/bin/hydra"
+    }
+  ],
+  "wireless-attacks": [
+    {
+      "name": "wifite",
+      "description": "Herramienta automatizada para auditorías WiFi",
+      "command": "/usr/bin/wifite"
+    },
+    {
+      "name": "aircrack-ng",
+      "description": "Suite para auditoría de redes inalámbricas",
+      "command": "/usr/bin/aircrack-ng"
+    }
+  ],
+  "other-tools": [
+    {
+      "name": "vim",
+      "description": "Editor de texto avanzado",
+      "command": "/usr/bin/vim"
+    },
+    {
+      "name": "nano",
+      "description": "Editor de texto simple",
+      "command": "/usr/bin/nano"
+    },
+    {
+      "name": "git",
+      "description": "Sistema de control de versiones",
+      "command": "/usr/bin/git"
+    }
+  ]
 }
 EOF
 
-# Verificar si se corrigió correctamente
-if [ $? -eq 0 ]; then
-    show_status "Archivo config.py corregido correctamente."
-else
-    show_error "No se pudo corregir el archivo config.py."
-    exit 1
-fi
+# Copiar archivos
+echo -e "${YELLOW}Copiando archivos...${NC}"
+sudo cp kaliBerry.py tool_manager.py config.py ui_manager.py styles.css /opt/kaliBerry/
 
-# Establecer permisos correctos
-echo "Estableciendo permisos correctos..."
-chmod 755 "$INSTALL_DIR"/*.py
-chmod 644 "$INSTALL_DIR"/styles.css
-chmod -R 755 "$INSTALL_DIR"
+# Establecer permisos
+echo -e "${YELLOW}Estableciendo permisos...${NC}"
+sudo chmod 755 /opt/kaliBerry/*.py
+sudo chmod 644 /opt/kaliBerry/styles.css
 
-show_status "Permisos establecidos correctamente."
+# Crear script ejecutable
+echo -e "${YELLOW}Creando script ejecutable...${NC}"
+sudo bash -c 'cat > /usr/local/bin/kaliBerry << EOF
+#!/bin/bash
+cd /opt/kaliBerry
+python3 /opt/kaliBerry/kaliBerry.py "\$@"
+EOF'
 
-# Crear directorio de configuración si no existe
-mkdir -p "$HOME/.config/kaliBerry"
-show_status "Directorio de configuración verificado."
+sudo chmod 755 /usr/local/bin/kaliBerry
 
-echo ""
-echo "====================================================="
-echo "      ¡Reparación de KaliBerry completada!           "
-echo "====================================================="
+echo -e "${GREEN}¡KaliBerry ha sido arreglado!${NC}"
 echo ""
 echo "Ahora puedes ejecutar KaliBerry escribiendo:"
 echo ""
 echo "  kaliBerry"
 echo ""
 echo "en cualquier terminal."
+echo ""
+echo "NUEVA FUNCIONALIDAD: Ahora puedes añadir herramientas manualmente"
+echo "desde dentro de KaliBerry seleccionando 'Añadir Herramienta' en el"
+echo "menú principal o presionando la tecla 'a'."
 echo ""
 
 # Preguntar si desea ejecutar KaliBerry ahora

@@ -10,7 +10,7 @@ import shutil
 import traceback
 from pathlib import Path
 from typing import Dict, List, Optional
-from config import TOOLS_CACHE_FILE, KALI_TOOLS_DIRS, TOOL_CATEGORIES, CONFIG_DIR
+from config import TOOLS_CACHE_FILE, CONFIG_DIR, TOOL_CATEGORIES
 
 class ToolManager:
     """Clase para gestionar las herramientas de Kali Linux."""
@@ -21,7 +21,7 @@ class ToolManager:
         self.load_tools()
     
     def load_tools(self) -> None:
-        """Cargar las herramientas desde el caché o detectarlas."""
+        """Cargar las herramientas desde el caché o crear un caché predefinido."""
         # Inicializar con categorías vacías
         self.tools = {category: [] for category in self.categories}
         
@@ -41,61 +41,100 @@ class ToolManager:
                 except Exception as e:
                     print(f"Error al cargar el caché: {e}")
             
-            # Si no se pudo cargar el caché, crear uno mínimo
-            print("Creando caché mínimo...")
-            self._create_minimal_cache()
+            # Si no se pudo cargar el caché, crear uno predefinido
+            print("Creando caché predefinido...")
+            self._create_predefined_cache()
         except Exception as e:
             print(f"Error al cargar herramientas: {e}")
             traceback.print_exc()
-            # En caso de error, crear un caché mínimo
-            self._create_minimal_cache()
+            # En caso de error, crear un caché predefinido
+            self._create_predefined_cache()
     
-    def _create_minimal_cache(self) -> None:
-        """Crear un caché mínimo con herramientas básicas."""
-        # Herramientas básicas
-        minimal_tools = {
+    def _create_predefined_cache(self) -> None:
+        """Crear un caché predefinido con herramientas comunes de Kali."""
+        # Herramientas predefinidas con rutas absolutas
+        predefined_tools = {
             "information-gathering": [
-                {"name": "nmap", "description": "Herramienta de escaneo de redes", "command": "nmap"}
+                {"name": "nmap", "description": "Herramienta de escaneo de redes", "command": "/usr/bin/nmap"},
+                {"name": "whois", "description": "Cliente whois para consultar información de dominios", "command": "/usr/bin/whois"},
+                {"name": "dig", "description": "Herramienta de consulta DNS", "command": "/usr/bin/dig"}
             ],
             "vulnerability-analysis": [
-                {"name": "nikto", "description": "Escáner de vulnerabilidades web", "command": "nikto"}
+                {"name": "nikto", "description": "Escáner de vulnerabilidades web", "command": "/usr/bin/nikto"}
             ],
             "web-application": [
-                {"name": "dirb", "description": "Escáner de directorios web", "command": "dirb"}
+                {"name": "dirb", "description": "Escáner de directorios web", "command": "/usr/bin/dirb"},
+                {"name": "sqlmap", "description": "Herramienta de detección y explotación de inyección SQL", "command": "/usr/bin/sqlmap"}
             ],
             "password-attacks": [
-                {"name": "john", "description": "John the Ripper - Cracking de contraseñas", "command": "john"}
+                {"name": "john", "description": "John the Ripper - Herramienta de cracking de contraseñas", "command": "/usr/bin/john"},
+                {"name": "hydra", "description": "Herramienta de fuerza bruta para múltiples servicios", "command": "/usr/bin/hydra"}
             ],
             "wireless-attacks": [
-                {"name": "wifite", "description": "Herramienta para auditorías WiFi", "command": "wifite"},
-                {"name": "aircrack-ng", "description": "Suite para auditoría WiFi", "command": "aircrack-ng"}
+                {"name": "wifite", "description": "Herramienta automatizada para auditorías WiFi", "command": "/usr/sbin/wifite"},
+                {"name": "aircrack-ng", "description": "Suite para auditoría de redes inalámbricas", "command": "/usr/bin/aircrack-ng"}
+            ],
+            "exploitation-tools": [
+                {"name": "metasploit", "description": "Framework de explotación", "command": "/usr/bin/msfconsole"},
+                {"name": "searchsploit", "description": "Buscador de exploits", "command": "/usr/bin/searchsploit"}
             ],
             "other-tools": [
-                {"name": "vim", "description": "Editor de texto avanzado", "command": "vim"},
-                {"name": "nano", "description": "Editor de texto simple", "command": "nano"}
+                {"name": "vim", "description": "Editor de texto avanzado", "command": "/usr/bin/vim"},
+                {"name": "nano", "description": "Editor de texto simple", "command": "/usr/bin/nano"},
+                {"name": "git", "description": "Sistema de control de versiones", "command": "/usr/bin/git"}
             ]
         }
         
-        # Filtrar solo las herramientas que existen
-        for category, tools_list in minimal_tools.items():
-            if category not in self.tools:
-                self.tools[category] = []
-                
+        # Verificar qué herramientas existen realmente en el sistema
+        for category, tools_list in predefined_tools.items():
+            self.tools[category] = []
             for tool in tools_list:
-                command = tool["command"]
-                if self._command_exists(command):
+                command_path = tool["command"]
+                if os.path.exists(command_path):
+                    # La herramienta existe, añadirla al caché
                     self.tools[category].append(tool)
                     print(f"Añadida herramienta: {tool['name']}")
+                else:
+                    # Intentar encontrar la herramienta en el PATH
+                    command_name = os.path.basename(command_path)
+                    command_in_path = shutil.which(command_name)
+                    if command_in_path:
+                        # Actualizar la ruta al comando
+                        tool["command"] = command_in_path
+                        self.tools[category].append(tool)
+                        print(f"Añadida herramienta (en PATH): {tool['name']}")
+        
+        # Verificar si hay herramientas en cada categoría
+        empty_categories = []
+        for category in self.categories:
+            if not self.tools.get(category, []):
+                empty_categories.append(category)
+        
+        # Eliminar categorías vacías
+        for category in empty_categories:
+            if category in self.tools:
+                del self.tools[category]
+        
+        # Asegurarse de que al menos hay una categoría con herramientas
+        if all(len(tools) == 0 for tools in self.tools.values()):
+            print("No se encontraron herramientas. Añadiendo herramientas básicas del sistema...")
+            
+            # Buscar herramientas básicas del sistema
+            basic_tools = ["ls", "cat", "grep", "find", "ps", "top", "htop", "ifconfig", "ip"]
+            self.tools["other-tools"] = []
+            
+            for tool in basic_tools:
+                tool_path = shutil.which(tool)
+                if tool_path:
+                    self.tools["other-tools"].append({
+                        "name": tool,
+                        "description": f"Herramienta básica del sistema: {tool}",
+                        "command": tool_path
+                    })
+                    print(f"Añadida herramienta básica: {tool}")
         
         # Guardar en caché
         self._save_cache()
-    
-    def _command_exists(self, command: str) -> bool:
-        """Verificar si un comando existe en el sistema."""
-        try:
-            return shutil.which(command) is not None
-        except Exception:
-            return False
     
     def _save_cache(self) -> None:
         """Guardar las herramientas en caché."""
@@ -115,7 +154,11 @@ class ToolManager:
     def get_categories(self) -> List[str]:
         """Obtener las categorías disponibles."""
         # Filtrar categorías vacías
-        return [category for category in self.categories if self.tools.get(category, [])]
+        return [category for category in self.tools.keys() if self.tools.get(category, [])]
+    
+    def get_all_categories(self) -> List[str]:
+        """Obtener todas las categorías, incluso las vacías."""
+        return list(self.categories)
     
     def get_tools_by_category(self, category: str) -> List[Dict]:
         """Obtener herramientas por categoría."""
@@ -128,6 +171,46 @@ class ToolManager:
                 if tool.get("name") == tool_name:
                     return tool
         return None
+    
+    def add_tool(self, name: str, description: str, command: str, category: str) -> bool:
+        """Añadir una herramienta manualmente."""
+        try:
+            # Verificar que la categoría existe
+            if category not in self.categories:
+                print(f"Categoría {category} no válida.")
+                return False
+            
+            # Verificar que el comando existe
+            if not os.path.exists(command) and not shutil.which(command):
+                print(f"Comando {command} no encontrado.")
+                return False
+            
+            # Asegurarse de que la categoría existe en el diccionario
+            if category not in self.tools:
+                self.tools[category] = []
+            
+            # Verificar si la herramienta ya existe
+            for tool in self.tools[category]:
+                if tool.get("name") == name:
+                    print(f"La herramienta {name} ya existe en la categoría {category}.")
+                    return False
+            
+            # Añadir la herramienta
+            self.tools[category].append({
+                "name": name,
+                "description": description or f"Herramienta: {name}",
+                "command": command
+            })
+            
+            # Guardar en caché
+            self._save_cache()
+            
+            print(f"Herramienta {name} añadida correctamente a la categoría {category}.")
+            return True
+        except Exception as e:
+            print(f"Error al añadir herramienta: {e}")
+            traceback.print_exc()
+            return False
     
     def launch_tool(self, tool_name: str) -> None:
         """Lanzar una herramienta."""

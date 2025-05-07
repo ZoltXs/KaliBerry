@@ -49,8 +49,8 @@ try:
     
     # Intentar importar los módulos
     from tool_manager import ToolManager
-    from ui_manager import CategoryView, ToolView, AboutView
-    from config import TITLE, VERSION, THEME
+    from ui_manager import CategoryView, ToolView, AboutView, AddToolView
+    from config import TITLE, VERSION, THEME, CONFIG_DIR, TOOLS_CACHE_FILE
 except ImportError as e:
     print(f"Error al importar módulos: {e}")
     print(f"Directorio actual: {os.getcwd()}")
@@ -80,6 +80,7 @@ class KaliBerryApp(App):
         Binding("enter", "select", "Seleccionar"),
         Binding("escape", "back", "Atrás"),
         Binding("?", "toggle_help", "Ayuda"),
+        Binding("a", "add_tool", "Añadir Herramienta"),
     ]
     
     current_view = reactive("main")
@@ -90,7 +91,23 @@ class KaliBerryApp(App):
         super().__init__()
         try:
             print("Inicializando KaliBerry...")
+            
+            # Asegurarse de que el directorio de configuración existe
+            os.makedirs(CONFIG_DIR, exist_ok=True)
+            
+            # Inicializar gestor de herramientas
             self.tool_manager = ToolManager()
+            
+            # Verificar que hay categorías
+            categories = self.tool_manager.get_categories()
+            if not categories:
+                print("ADVERTENCIA: No se encontraron categorías de herramientas.")
+                print(f"Contenido del caché: {os.path.exists(TOOLS_CACHE_FILE)}")
+                if os.path.exists(TOOLS_CACHE_FILE):
+                    print(f"Tamaño del caché: {os.path.getsize(TOOLS_CACHE_FILE)} bytes")
+            else:
+                print(f"Categorías encontradas: {categories}")
+            
             print("Gestor de herramientas inicializado correctamente.")
         except Exception as e:
             print(f"Error al inicializar el gestor de herramientas: {e}")
@@ -104,6 +121,7 @@ class KaliBerryApp(App):
         with Container(id="main-container"):
             yield CategoryView(self.tool_manager.get_categories())
             yield ToolView(self.tool_manager)
+            yield AddToolView(self.tool_manager)
             yield AboutView()
         
         yield Footer()
@@ -114,6 +132,7 @@ class KaliBerryApp(App):
             print("Montando la aplicación...")
             self.query_one(CategoryView).display = True
             self.query_one(ToolView).display = False
+            self.query_one(AddToolView).display = False
             self.query_one(AboutView).display = False
             print("Aplicación montada correctamente.")
         except Exception as e:
@@ -126,6 +145,7 @@ class KaliBerryApp(App):
             self.current_view = "main"
             self.query_one(CategoryView).display = True
             self.query_one(ToolView).display = False
+            self.query_one(AddToolView).display = False
             self.query_one(AboutView).display = False
         except Exception as e:
             print(f"Error al volver al menú principal: {e}")
@@ -140,8 +160,27 @@ class KaliBerryApp(App):
             elif self.current_view == "tool_detail":
                 self.current_view = "tools"
                 self.query_one(ToolView).show_tools_list()
+            elif self.current_view == "add_tool":
+                self.current_view = "main"
+                self.query_one(CategoryView).display = True
+                self.query_one(AddToolView).display = False
+            elif self.current_view == "about":
+                self.current_view = "main"
+                self.query_one(CategoryView).display = True
+                self.query_one(AboutView).display = False
         except Exception as e:
             print(f"Error al volver a la vista anterior: {e}")
+    
+    def action_add_tool(self) -> None:
+        """Mostrar la vista para añadir herramientas."""
+        try:
+            self.current_view = "add_tool"
+            self.query_one(CategoryView).display = False
+            self.query_one(ToolView).display = False
+            self.query_one(AddToolView).display = True
+            self.query_one(AboutView).display = False
+        except Exception as e:
+            print(f"Error al mostrar la vista para añadir herramientas: {e}")
     
     def action_select(self) -> None:
         """Seleccionar el elemento actual."""
@@ -152,6 +191,8 @@ class KaliBerryApp(App):
                     self.current_view = "about"
                     self.query_one(CategoryView).display = False
                     self.query_one(AboutView).display = True
+                elif selected == "add-tool":
+                    self.action_add_tool()
                 else:
                     self.selected_category = selected
                     self.current_view = "tools"
@@ -168,6 +209,7 @@ class KaliBerryApp(App):
                 self.tool_manager.launch_tool(self.selected_tool)
         except Exception as e:
             print(f"Error al seleccionar elemento: {e}")
+            traceback.print_exc()
     
     def on_button_pressed(self, event) -> None:
         """Manejar eventos de botones."""
@@ -175,6 +217,13 @@ class KaliBerryApp(App):
             button_id = event.button.id
             if button_id == "run-tool-btn" and self.selected_tool:
                 self.tool_manager.launch_tool(self.selected_tool)
+            elif button_id == "add-tool-btn":
+                success = self.query_one(AddToolView).add_tool()
+                if success:
+                    # Actualizar la lista de categorías
+                    self.query_one(CategoryView).categories = self.tool_manager.get_categories()
+            elif button_id == "cancel-add-tool-btn":
+                self.action_home()
         except Exception as e:
             print(f"Error al manejar evento de botón: {e}")
 

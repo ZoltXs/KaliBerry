@@ -4,7 +4,7 @@ Gestor de interfaz de usuario para KaliBerry
 """
 
 from textual.widget import Widget
-from textual.widgets import Static, Button, ListView, ListItem, Label
+from textual.widgets import Static, Button, ListView, ListItem, Label, Input, Select
 from textual.containers import Container, Vertical, Horizontal
 from textual.reactive import reactive
 from typing import List, Dict, Optional
@@ -32,6 +32,7 @@ class CategoryView(Static):
                     for category in self.categories:
                         yield ListItem(Label(self._format_category_name(category)), id=f"category-{category}")
             
+            yield ListItem(Label("Añadir Herramienta"), id="category-add-tool")
             yield ListItem(Label("Acerca de KaliBerry"), id="category-about")
     
     def _format_category_name(self, category: str) -> str:
@@ -154,6 +155,97 @@ class ToolView(Static):
         """Formatear el nombre de la categoría para mostrar."""
         return category.replace("-", " ").title()
 
+class AddToolView(Static):
+    """Vista para añadir herramientas manualmente."""
+    
+    display = reactive(False)
+    
+    def __init__(self, tool_manager):
+        super().__init__()
+        self.tool_manager = tool_manager
+    
+    def compose(self):
+        """Componer la vista para añadir herramientas."""
+        with Container(id="add-tool-container"):
+            yield Label("Añadir Herramienta Manualmente", id="add-tool-title")
+            
+            with Vertical(id="add-tool-form"):
+                yield Label("Nombre de la herramienta:")
+                yield Input(placeholder="Ejemplo: nmap", id="tool-name-input")
+                
+                yield Label("Descripción:")
+                yield Input(placeholder="Ejemplo: Herramienta de escaneo de redes", id="tool-description-input")
+                
+                yield Label("Comando (ruta completa o nombre):")
+                yield Input(placeholder="Ejemplo: /usr/bin/nmap o simplemente nmap", id="tool-command-input")
+                
+                yield Label("Categoría:")
+                categories = self.tool_manager.get_all_categories()
+                yield Select(
+                    options=[(cat, self._format_category_name(cat)) for cat in categories],
+                    value=categories[0] if categories else "",
+                    id="tool-category-select"
+                )
+                
+                with Horizontal(id="add-tool-buttons"):
+                    yield Button("Añadir Herramienta", id="add-tool-btn")
+                    yield Button("Cancelar", id="cancel-add-tool-btn")
+                
+                yield Label("", id="add-tool-status")
+    
+    def watch_display(self, display: bool) -> None:
+        """Observar cambios en la propiedad display."""
+        if display:
+            self.add_class("visible")
+            self.remove_class("hidden")
+        else:
+            self.add_class("hidden")
+            self.remove_class("visible")
+    
+    def _format_category_name(self, category: str) -> str:
+        """Formatear el nombre de la categoría para mostrar."""
+        return category.replace("-", " ").title()
+    
+    def clear_form(self) -> None:
+        """Limpiar el formulario."""
+        self.query_one("#tool-name-input").value = ""
+        self.query_one("#tool-description-input").value = ""
+        self.query_one("#tool-command-input").value = ""
+        self.query_one("#add-tool-status").update("")
+    
+    def add_tool(self) -> bool:
+        """Añadir una herramienta."""
+        try:
+            name = self.query_one("#tool-name-input").value
+            description = self.query_one("#tool-description-input").value
+            command = self.query_one("#tool-command-input").value
+            category = self.query_one("#tool-category-select").value
+            
+            if not name or not command:
+                self.query_one("#add-tool-status").update("Error: El nombre y el comando son obligatorios.")
+                return False
+            
+            # Si el comando no es una ruta absoluta, intentar encontrarlo
+            if not command.startswith("/"):
+                import shutil
+                command_path = shutil.which(command)
+                if command_path:
+                    command = command_path
+            
+            # Añadir la herramienta
+            success = self.tool_manager.add_tool(name, description, command, category)
+            
+            if success:
+                self.query_one("#add-tool-status").update(f"Herramienta '{name}' añadida correctamente.")
+                self.clear_form()
+                return True
+            else:
+                self.query_one("#add-tool-status").update("Error al añadir la herramienta.")
+                return False
+        except Exception as e:
+            self.query_one("#add-tool-status").update(f"Error: {str(e)}")
+            return False
+
 class AboutView(Static):
     """Vista de información sobre KaliBerry."""
     
@@ -173,6 +265,7 @@ class AboutView(Static):
                 yield Label("• Interfaz intuitiva y fácil de usar")
                 yield Label("• Navegación sencilla entre categorías y herramientas")
                 yield Label("• Información detallada sobre cada herramienta")
+                yield Label("• Añadir herramientas manualmente")
                 yield Label("")
                 yield Label("Inspirado en la estética de bebbleberry")
                 yield Label("https://github.com/alliraine/bebbleberry")
