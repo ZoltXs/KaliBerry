@@ -1,0 +1,6 @@
+0x089128f7	sharp_memory_add_overlay	/var/tmp/jdi-drm-rpi/sharp-drm	EXPORT_SYMBOL_GPL	
+0x5051489f	sharp_memory_clear_overlays	/var/tmp/jdi-drm-rpi/sharp-drm	EXPORT_SYMBOL_GPL	
+0x7fffffff	sharp_memory_hide_overlay	/var/tmp/jdi-drm-rpi/sharp-drm	EXPORT_SYMBOL_GPL	
+0x7fffffff	sharp_memory_remove_overlay	/var/tmp/jdi-drm-rpi/sharp-drm	EXPORT_SYMBOL_GPL	
+0x78e91708	sharp_memory_set_invert	/var/tmp/jdi-drm-rpi/sharp-drm	EXPORT_SYMBOL_GPL	
+0x14b1f60d	sharp_memory_show_overlay	/var/tmp/jdi-drm-rpi/sharp-drm	EXPORT_SYMBOL_GPL	
