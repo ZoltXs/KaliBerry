@@ -11,86 +11,167 @@ display_error() {
     main_menu
 }
 
-# Function to show progress
+# Function to show progress (all commands run silently in background)
 show_progress() {
     local cmd=$1
     local message=$2
-    local total=100
-    local progress=0
     
-    (
-        while [ $progress -lt 100 ]; do
-            echo $progress
-            progress=$((progress + 10))
-            sleep 0.2
-        done
-    ) | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+    # Show 0% at start
+    echo "0" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
         --gauge "$message" 10 70 0
     
-    # Execute the actual command
-    eval "$cmd" 2>/tmp/error.log || {
+    # Execute command in background and capture PID
+    if [[ "$cmd" == *"make"* ]]; then
+        # Run make commands with complete redirection in a subshell
+        ( eval "$cmd" > /dev/null 2>/tmp/error.log ) &
+        local cmd_pid=$!
+    else
+        # Execute other commands silently in background
+        eval "$cmd > /dev/null 2>/tmp/error.log" &
+        local cmd_pid=$!
+    fi
+    
+    # Monitor command progress
+    while kill -0 $cmd_pid 2>/dev/null; do
+        echo "50" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+            --gauge "$message" 10 70 0
+        sleep 0.5
+    done
+    
+    # Wait for command to complete and get exit status
+    wait $cmd_pid
+    local exit_status=$?
+    
+    # Show 100% completion
+    echo "100" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+        --gauge "$message" 10 70 0
+    sleep 0.5
+    
+    # Check if command failed
+    if [ $exit_status -ne 0 ]; then
         display_error "$(cat /tmp/error.log)"
         return 1
-    }
+    fi
+    
     return 0
 }
 
-# Function to show progress without stopping on errors
+# Function to show progress without stopping on errors (all commands run silently in background)
 show_progress_continue() {
     local cmd=$1
     local message=$2
-    local total=100
-    local progress=0
     
-    (
-        while [ $progress -lt 100 ]; do
-            echo $progress
-            progress=$((progress + 10))
-            sleep 0.2
-        done
-    ) | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+    # Show 0% at start
+    echo "0" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
         --gauge "$message" 10 70 0
     
-    # Execute the actual command
-    eval "$cmd" 2>/tmp/error.log || {
+    # Execute command in background and capture PID
+    if [[ "$cmd" == *"make"* ]]; then
+        # Run make commands with complete redirection in a subshell
+        ( eval "$cmd" > /dev/null 2>/tmp/error.log ) &
+        local cmd_pid=$!
+    else
+        # Execute other commands silently in background
+        eval "$cmd > /dev/null 2>/tmp/error.log" &
+        local cmd_pid=$!
+    fi
+    
+    # Monitor command progress
+    while kill -0 $cmd_pid 2>/dev/null; do
+        echo "50" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+            --gauge "$message" 10 70 0
+        sleep 0.5
+    done
+    
+    # Wait for command to complete and get exit status
+    wait $cmd_pid
+    local exit_status=$?
+    
+    # Show 100% completion
+    echo "100" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+        --gauge "$message" 10 70 0
+    sleep 0.5
+    
+    # Check if command failed but continue anyway
+    if [ $exit_status -ne 0 ]; then
         dialog --colors --title "\Z1Warning\Zn" --backtitle "KaliBerry Config" \
             --msgbox "\Z1Error en comando:\Zn $cmd\n\n\Z1Mensaje:\Zn $(cat /tmp/error.log)\n\nContinuando con la instalación..." 10 70
-        sleep 2
-        return 0
-    }
+        sleep 1
+    fi
+    
+    return 0
+}
+
+# Function to show progress for make commands - ignores all errors silently
+show_progress_make_silent() {
+    local cmd=$1
+    local message=$2
+    
+    # Show 0% at start
+    echo "0" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+        --gauge "$message" 10 70 0
+    
+    # Execute make commands completely silently, ignore all errors
+    eval "$cmd > /dev/null 2>&1" &
+    local cmd_pid=$!
+    
+    # Monitor command progress
+    while kill -0 $cmd_pid 2>/dev/null; do
+        echo "50" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+            --gauge "$message" 10 70 0
+        sleep 0.5
+    done
+    
+    # Wait for command to complete (ignore exit status)
+    wait $cmd_pid || true
+    
+    # Show 100% completion
+    echo "100" | dialog --colors --title "$message" --backtitle "KaliBerry Config" \
+        --gauge "$message" 10 70 0
+    sleep 0.5
+    
     return 0
 }
 
 # Function for KaliBerry Config option
 kaliberryconfig() {
     # First ensure we're in the correct directory
-    cd /home/kali/KaliBerry || {
+    cd /home/kali/KaliBerry > /dev/null 2>&1 || {
         display_error "No se pudo acceder al directorio /home/kali/KaliBerry"
         return 1
     }
     
     dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
         --infobox "Instalando, aproveche a tomarse un cafe!!!" 3 50
-    sleep 2
+    sleep 1
     
     # Command 1
-    show_progress "sudo mv /etc/apt/sources.list.d/re4son.list /etc/apt/sources.list.d/re4son.list.bak" "Renombrando re4son.list (10%)"
-    sleep 2
+    show_progress "sudo mv /etc/apt/sources.list.d/re4son.list /etc/apt/sources.list.d/re4son.list.old" "Renombrando re4son.list"
+    sleep 1
     
     # Command 2
-    show_progress "echo \"deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.org/debian bullseye main\" | sudo tee /etc/apt/sources.list.d/raspi.list" "Añadiendo repositorio Raspberry Pi (30%)"
-    sleep 2
+    show_progress "sudo mv /etc/apt/sources.list /etc/apt/sources.list.old" "Renombrando sources.list"
+    sleep 1
+    
     
     # Command 3
-    show_progress "curl -fsSL https://ftp-master.debian.org/keys/archive-key-11.asc | gpg --dearmor | sudo tee /usr/share/keyrings/debian-archive-keyring.gpg >/dev/null" "Añadiendo llave Debian (50%)"
-    sleep 2
+    show_progress "echo \"deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.org/debian bullseye main\" | sudo tee /etc/apt/sources.list.d/raspi.list" "Añadiendo repositorio Raspberry Pi"
+    sleep 1
     
     # Command 4
-    show_progress "sudo apt update" "Actualizando listas de paquetes (70%)"
-    sleep 2
-    
+    show_progress "echo \"deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian bullseye main contrib non-free non-free-firmware\" | sudo tee /etc/apt/sources.list" "Añadiendo repositorio Debian"
+    sleep 1
+
     # Command 5
-    show_progress "sudo apt-get install -y raspberrypi-kernel" "Instalando kernel Raspberry Pi (90%)"
+    show_progress "curl -fsSL https://ftp-master.debian.org/keys/archive-key-11.asc | gpg --dearmor | sudo tee /usr/share/keyrings/debian-archive-keyring.gpg >/dev/null" "Añadiendo llave Debian"
+    sleep 1
+    
+    # Command 6
+    show_progress "sudo apt update" "Actualizando listas de paquetes"
+    sleep 1
+    
+    # Command 7
+    show_progress "sudo apt-get install -y raspberrypi-kernel" "Instalando kernel Raspberry Pi"
     
     # Countdown for reboot
     for i in {10..1}; do
@@ -99,71 +180,98 @@ kaliberryconfig() {
         sleep 1
     done
     
-    # Return to main menu instead of actual reboot for this script
-    main_menu
+    # Actually reboot the system
+    sudo reboot
 }
 
 # Function for ColorBerry Display option
 colorberrydisplay() {
     # First ensure we're in the correct directory
-    cd /home/kali/KaliBerry || {
+    cd /home/kali/KaliBerry > /dev/null 2>&1 || {
         display_error "No se pudo acceder al directorio /home/kali/KaliBerry"
         return 1
     }
     
     # Command 1
-    show_progress_continue "sudo cp -r jdi-drm-rpi /var/tmp/" "Copiando directorio jdi-drm-rpi (10%)"
-    sleep 2
+    show_progress_continue "sudo cp -r jdi-drm-rpi /var/tmp/" "Copiando directorio jdi-drm-rpi"
+    sleep 1
     
     # Command 2
-    show_progress_continue "cd /" "Cambiando al directorio raíz (20%)"
+    show_progress_continue "cd /var/tmp/jdi-drm-rpi" "Cambiando al directorio jdi-drm-rpi"
+    sleep 1
+    
+    # Command 2.5 - Install kernel headers
+    show_progress_continue "sudo apt-get install -y raspberrypi-kernel-headers" "Instalando kernel headers Vueva a tomar un ☕️"
     sleep 2
     
-    # Command 3
-    show_progress_continue "cd /var/tmp/jdi-drm-rpi" "Cambiando al directorio jdi-drm-rpi (30%)"
-    sleep 2
+    # Command 3 - Make command with silent error handling
+    show_progress_make_silent "sudo make" "Compilando driver"
+    sleep 1
     
-    # Command 4
-    show_progress_continue "sudo make" "Compilando driver (40%)"
-    sleep 2
+    # Command 4 - Make install command with silent error handling
+    show_progress_make_silent "sudo make install" "Instalando driver"
+    sleep 1
     
     # Command 5
-    show_progress_continue "sudo make install" "Instalando driver (50%)"
-    sleep 2
+    show_progress_continue "sudo mkdir -p /home/kali/sbin" "Creando directorio sbin"
+    sleep 1
     
     # Command 6
-    show_progress_continue "sudo mkdir -p /home/kali/sbin" "Creando directorio sbin (60%)"
-    sleep 2
+    show_progress_continue "sudo cp /home/kali/KaliBerry/back.py /home/kali/sbin/" "Copiando script back.py"
+    sleep 1
     
     # Command 7
-    show_progress_continue "sudo mv back.py /home/kali/sbin" "Moviendo script back.py (70%)"
-    sleep 2
+    show_progress_continue "sudo chmod +x /home/kali/sbin/back.py" "Haciendo ejecutable el script"
+    sleep 1
     
     # Command 8
-    show_progress_continue "cd .." "Cambiando al directorio superior (75%)"
-    sleep 2
+    show_progress_continue "(crontab -l 2>/dev/null; echo '@reboot sleep 5; /home/kali/sbin/back.py &') | crontab -" "Configurando crontab"
+    sleep 1
     
-    # Command 9
-    show_progress_continue "cd sbin" "Cambiando al directorio sbin (80%)"
-    sleep 2
+    # Command 9 - Enable i2c
+    show_progress_continue "sudo raspi-config nonint do_i2c 0" "Activando I2C"
+    sleep 1
     
-    # Command 10
-    show_progress_continue "sudo chmod +x /home/kali/sbin/back.py" "Haciendo ejecutable el script (85%)"
-    sleep 2
+    # Command 10 - Add configuration to .bashrc using a temporary file approach
+    show_progress_continue "cat > /tmp/bashrc_append.txt << 'EOF'
+if [ -z \"$SSH_CONNECTION\" ]; then
+        if [[ \"$(tty)\" =~ /dev/tty ]] && type fbterm > /dev/null 2>&1; then
+                fbterm
+        # otherwise, start/attach to tmux
+        elif [ -z \"$TMUX\" ] && type tmux >/dev/null 2>&1; then
+                fcitx 2>/dev/null &
+                tmux new -As \"$(basename $(tty))\"
+        fi
+fi
+export PROMPT=\"%c$ \"
+export PATH=$PATH:~/sbin
+export SDL_VIDEODRIVER=\"fbcon\"
+export SDL_FBDEV=\"/dev/fb1\"
+alias d0=\"echo 0 | sudo tee /sys/module/jdi_drm/parameters/dither\"
+alias d3=\"echo 3 | sudo tee /sys/module/jdi_drm/parameters/dither\"
+alias d4=\"echo 4 | sudo tee /sys/module/jdi_drm/parameters/dither\"
+alias b=\"echo 1 | sudo tee /sys/module/jdi_drm/parameters/backlit\"
+alias bn=\"echo 0 | sudo tee /sys/module/jdi_drm/parameters/backlit\"
+alias key='echo \"keys\" | sudo tee /sys/module/beepy_kbd/parameters/touch_as > /dev/null'
+alias mouse='echo \"mouse\" | sudo tee /sys/module/beepy_kbd/parameters/touch_as > /dev/null'
+EOF
+sudo cat /tmp/bashrc_append.txt >> /home/kali/.bashrc
+rm /tmp/bashrc_append.txt" "Configurando .bashrc"
+    sleep 1
     
-    # Command 11
-    show_progress_continue "(crontab -l 2>/dev/null; echo '@reboot sleep 5; /home/kali/sbin/back.py &') | crontab -" "Configurando crontab (90%)"
-    sleep 2
+    # Command 11 - Install python3-pip
+    show_progress_continue "sudo apt install -y python3-pip" "Instalando python3-pip"
+    sleep 1
     
-    # Command 12 - Enable i2c
-    show_progress_continue "sudo raspi-config nonint do_i2c 0" "Activando I2C (100%)"
-    sleep 2
+    # Command 12 - Install RPi.GPIO
+    show_progress_continue "pip3 install RPi.GPIO" "Instalando RPi.GPIO"
+    sleep 1
     
     # Success message
     clear
     dialog --colors --title "ColorBerry Display" --backtitle "KaliBerry Config" \
         --infobox "Instalación Exitosa" 3 30
-    sleep 4
+    sleep 2
     
     main_menu
 }
@@ -171,28 +279,28 @@ colorberrydisplay() {
 # Function for Colorberry-KBD option
 colorberrykbd() {
     # First ensure we're in the correct directory
-    cd /home/kali/KaliBerry || {
+    cd /home/kali/KaliBerry > /dev/null 2>&1 || {
         display_error "No se pudo acceder al directorio /home/kali/KaliBerry"
         return 1
     }
     
     # Command 1
-    show_progress "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado (25%)"
-    sleep 2
+    show_progress "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
+    sleep 1
     
-    # Command 2
-    show_progress "sudo make" "Compilando driver de teclado (50%)"
-    sleep 2
+    # Command 2 - Make command with special handling
+    show_progress "sudo make" "Compilando driver de teclado"
+    sleep 1
     
-    # Command 3
-    show_progress "sudo make install" "Instalando driver de teclado (100%)"
-    sleep 2
+    # Command 3 - Make install command with special handling
+    show_progress "sudo make install" "Instalando driver de teclado"
+    sleep 1
     
     # Success message
     clear
     dialog --colors --title "Colorberry-KBD" --backtitle "KaliBerry Config" \
         --infobox "Instalación Exitosa" 3 30
-    sleep 4
+    sleep 2
     
     main_menu
 }
@@ -201,7 +309,7 @@ colorberrykbd() {
 exit_app() {
     dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
         --infobox "Gracias por utilizar KaliBerry Config By N@Xs" 3 50
-    sleep 2
+    sleep 1
     clear
     exit 0
 }
@@ -230,14 +338,14 @@ main_menu() {
 # Check if dialog is installed
 if ! command -v dialog &> /dev/null; then
     echo "Installing dialog package..."
-    sudo apt-get update
-    sudo apt-get install -y dialog
+    sudo apt-get update > /dev/null 2>&1
+    sudo apt-get install -y dialog > /dev/null 2>&1
 fi
 
 # Check if KaliBerry directory exists
 if [ ! -d "/home/kali/KaliBerry" ]; then
     echo "Creating KaliBerry directory..."
-    sudo mkdir -p /home/kali/KaliBerry
+    sudo mkdir -p /home/kali/KaliBerry > /dev/null 2>&1
 fi
 
 # Set terminal colors (blue background, white text)
