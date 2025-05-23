@@ -171,7 +171,11 @@ kaliberryconfig() {
     sleep 1
     
     # Command 7
-    show_progress "sudo apt-get install -y raspberrypi-kernel" "Instalando kernel Raspberry Pi"
+    # show_progress "sudo apt-get install -y raspberrypi-kernel" "Instalando kernel Raspberry Pi"
+
+    # Command 8 - Install kernel headers
+    show_progress_continue "sudo apt-get install -y raspberrypi-kernel-headers" "Instalando kernel headers Vueva a tomar un ☕️"
+    sleep 1
     
     # Countdown for reboot
     for i in {10..1}; do
@@ -200,9 +204,6 @@ colorberrydisplay() {
     show_progress_continue "cd /var/tmp/jdi-drm-rpi" "Cambiando al directorio jdi-drm-rpi"
     sleep 1
     
-    # Command 2.5 - Install kernel headers
-    show_progress_continue "sudo apt-get install -y raspberrypi-kernel-headers" "Instalando kernel headers Vueva a tomar un ☕️"
-    sleep 2
     
     # Command 3 - Make command with silent error handling
     show_progress_make_silent "sudo make" "Compilando driver"
