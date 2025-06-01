@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Mostrar imagen por 2 segundos
+fbi -T 1 -a /KaliBerry/KaliBerry.png &> /dev/null &
+sleep 2
+killall fbi
+
+# Continuar con el script interactivo
+clear
+
+
 # KaliBerry Config Application
 # By N@Xs
 
