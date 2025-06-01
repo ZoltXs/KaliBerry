@@ -299,27 +299,25 @@ colorberrykbd() {
         display_error "No se pudo acceder al directorio /home/kali/KaliBerry"
         return 1
     }
-    # Command 1
-    # show_progress "cd KaliBerry" "Cambiando al directorio KaliBerry"
-    # sleep 1    
-    # Command 2
-    show_progress "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
+
+    # Cambiar al directorio del driver (usa show_progress_continue por si no existe el directorio o hay fallo menor)
+    show_progress_continue "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
     sleep 1
     
-    # Command 3 - Make command with special handling
-    show_progress "sudo make" "Compilando driver de teclado"
+    # Compilar driver sin detenerse ante errores
+    show_progress_make_silent "sudo make" "Compilando driver de teclado"
     sleep 1
-    
-    # Command 4 - Make install command with special handling
-    show_progress "sudo make install" "Instalando driver de teclado"
+
+    # Instalar driver sin detenerse ante errores
+    show_progress_make_silent "sudo make install" "Instalando driver de teclado"
     sleep 1
-    
-    # Success message
+
+    # Mensaje de éxito
     clear
     dialog --colors --title "Colorberry-KBD" --backtitle "KaliBerry Config" \
-        --infobox "Instalación Exitosa" 3 30
+        --infobox "Instalación finalizada (errores ignorados)" 3 40
     sleep 2
-    
+
     main_menu
 }
 
