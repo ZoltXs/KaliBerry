@@ -187,7 +187,7 @@ EOF'" "Configurando sources.list"
     sleep 1
     
     # Command 10 - Install kernel packages
-    show_progress "sudo apt install -y kalipi-kernel kalipi-kernel-headers" "Instalando kernel Kali Pi"
+    show_progress "sudo apt install raspberrypi-kernel raspberrypi-kernel-headers" "Instalando kernel Debian 11 bullseye"
     
     # Countdown for reboot
     for i in {10..1}; do
