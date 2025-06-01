@@ -1,11 +1,23 @@
 #!/bin/bash
 
-# Mostrar imagen por 2 segundos
-fbi -T 1 -a /KaliBerry/KaliBerry.png &> /dev/null &
-sleep 2
-killall fbi
+# Ruta completa a la imagen
+IMAGE_PATH="/ruta/completa/a/KaliBerry.png"
 
-# Continuar con el script interactivo
+# Verifica si fbi está instalado
+if ! command -v fbi &> /dev/null; then
+    echo "Preparando KaliBerry Config..."
+    # Instala fbi en segundo plano sin mostrar salida
+    sudo apt-get install -y fbi &> /dev/null &
+    # Espera breve mientras instala en segundo plano
+    sleep 3
+else
+    # Mostrar la imagen si fbi ya está instalado
+    fbi -T 1 -a "$IMAGE_PATH" &> /dev/null &
+    sleep 2
+    killall fbi
+fi
+
+# Limpiar pantalla antes de iniciar el menú
 clear
 
 
