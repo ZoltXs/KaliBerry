@@ -207,48 +207,49 @@ colorberrydisplay() {
         display_error "No se pudo acceder al directorio /home/kali/KaliBerry"
         return 1
     }
-    
-    # Command 1
-    show_progress_continue "sudo cp -r jdi-drm-rpi /var/tmp/" "Copiando directorio jdi-drm-rpi"
+
+     # Command 1
+    show_progress_continue "cd KaliBerry" "Copiando directorio jdi-drm-rpi"
     sleep 1
     
     # Command 2
+    show_progress_continue "sudo cp -r jdi-drm-rpi /var/tmp/" "Copiando directorio jdi-drm-rpi"
+    sleep 1
+    
+    # Command 3
     show_progress_continue "cd /var/tmp/jdi-drm-rpi" "Cambiando al directorio jdi-drm-rpi"
     sleep 1
     
-    # Command 2.5 - Install kernel headers
-    show_progress_continue "sudo apt-get install -y raspberrypi-kernel-headers" "Instalando kernel headers Vueva a tomar un ☕️"
-    sleep 2
     
-    # Command 3 - Make command with silent error handling
+    # Command 4 - Make command with silent error handling
     show_progress_make_silent "sudo make" "Compilando driver"
     sleep 1
     
-    # Command 4 - Make install command with silent error handling
+    # Command 5 - Make install command with silent error handling
     show_progress_make_silent "sudo make install" "Instalando driver"
     sleep 1
     
-    # Command 5
+    # Command 6
     show_progress_continue "sudo mkdir -p /home/kali/sbin" "Creando directorio sbin"
     sleep 1
     
-    # Command 6
+    # Command 7
     show_progress_continue "sudo cp /home/kali/KaliBerry/back.py /home/kali/sbin/" "Copiando script back.py"
     sleep 1
     
-    # Command 7
+    # Command 8
     show_progress_continue "sudo chmod +x /home/kali/sbin/back.py" "Haciendo ejecutable el script"
     sleep 1
     
-    # Command 8
+    # Command 9
     show_progress_continue "(crontab -l 2>/dev/null; echo '@reboot sleep 5; /home/kali/sbin/back.py &') | crontab -" "Configurando crontab"
     sleep 1
     
-    # Command 9 - Enable i2c
+    # Command 10 - Enable i2c
     show_progress_continue "sudo raspi-config nonint do_i2c 0" "Activando I2C"
     sleep 1
     
-    # Command 10 - Add configuration to .bashrc using a temporary file approach
+    # Command 11 - Add configuration to .bashrc using a temporary file approach
     show_progress_continue "cat > /tmp/bashrc_append.txt << 'EOF'
 if [ -z \"$SSH_CONNECTION\" ]; then
         if [[ \"$(tty)\" =~ /dev/tty ]] && type fbterm > /dev/null 2>&1; then
@@ -275,21 +276,30 @@ sudo cat /tmp/bashrc_append.txt >> /home/kali/.bashrc
 rm /tmp/bashrc_append.txt" "Configurando .bashrc"
     sleep 1
     
-    # Command 11 - Install python3-pip
+    # Command 12 - Install python3-pip
     show_progress_continue "sudo apt install -y python3-pip" "Instalando python3-pip"
     sleep 1
     
     # Command 12 - Install RPi.GPIO
     show_progress_continue "pip3 install RPi.GPIO" "Instalando RPi.GPIO"
     sleep 1
-    
+
     # Success message
     clear
     dialog --colors --title "ColorBerry Display" --backtitle "KaliBerry Config" \
         --infobox "Instalación Exitosa" 3 30
     sleep 2
+
+   # Countdown for reboot
+    for i in {5..1}; do
+        dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
+            --infobox "EL EQUIPO SE VA A REINICIAR\n\nTiempo restante: $i segundos" 5 50
+        sleep 1
+    done
     
-    main_menu
+    # Actually reboot the system
+    sudo reboot
+
 }
 
 # Function for Colorberry-KBD option
@@ -299,6 +309,10 @@ colorberrykbd() {
         display_error "No se pudo acceder al directorio /home/kali/KaliBerry"
         return 1
     }
+
+        # Cambiar al directorio del d (usa show_progress_continue por si no existe el directorio o hay fallo menor)
+    show_progress_continue "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
+    sleep 1
 
     # Cambiar al directorio del driver (usa show_progress_continue por si no existe el directorio o hay fallo menor)
     show_progress_continue "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
