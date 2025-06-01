@@ -300,8 +300,8 @@ colorberrykbd() {
         return 1
     }
     # Command 1
-    show_progress "cd KaliBerry" "Cambiando al directorio KaliBerry"
-    sleep 1    
+    # show_progress "cd KaliBerry" "Cambiando al directorio KaliBerry"
+    # sleep 1    
     # Command 2
     show_progress "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
     sleep 1
