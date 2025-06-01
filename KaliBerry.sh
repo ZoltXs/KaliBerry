@@ -145,35 +145,49 @@ kaliberryconfig() {
         --infobox "Instalando, aproveche a tomarse un cafe!!!" 3 50
     sleep 1
     
-    # Command 1
-    show_progress "sudo mv /etc/apt/sources.list.d/re4son.list /etc/apt/sources.list.d/re4son.list.old" "Renombrando re4son.list"
+    # Command 1 - Edit sources.list with new content
+    show_progress "sudo bash -c 'cat > /etc/apt/sources.list << EOF
+deb http://deb.debian.org/debian bullseye main contrib non-free
+deb http://deb.debian.org/debian bullseye-updates main contrib non-free
+deb http://security.debian.org/debian-security bullseye-security main contrib non-free
+deb http://archive.raspberrypi.org/debian bullseye main
+EOF'" "Configurando sources.list"
     sleep 1
     
-    # Command 2
-    show_progress "sudo mv /etc/apt/sources.list /etc/apt/sources.list.old" "Renombrando sources.list"
+    # Command 2 - Remove previous corrupt keys
+    show_progress "sudo rm -f /etc/apt/trusted.gpg.d/raspberrypi*.gpg" "Eliminando claves previas corruptas"
     sleep 1
     
-    
-    # Command 3
-    show_progress "echo \"deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.org/debian bullseye main\" | sudo tee /etc/apt/sources.list.d/raspi.list" "Añadiendo repositorio Raspberry Pi"
+    # Command 3 - Download official key
+    show_progress "wget https://archive.raspberrypi.org/debian/raspberrypi.gpg.key" "Descargando clave oficial"
     sleep 1
     
-    # Command 4
-    show_progress "echo \"deb http://deb.debian.org/debian bullseye main contrib non-free non-free-firmware
-deb http://security.debian.org/debian-security bullseye-security main contrib non-free non-free-firmware
-deb http://deb.debian.org/debian bullseye-updates main contrib non-free non-free-firmware\" | sudo tee /etc/apt/sources.list" "Añadiendo repositorios Debian"
-    sleep 1
-
-    # Command 5
-    show_progress "curl -fsSL https://ftp-master.debian.org/keys/archive-key-11.asc | gpg --dearmor | sudo tee /usr/share/keyrings/debian-archive-keyring.gpg >/dev/null" "Añadiendo llave Debian"
+    # Command 4 - Convert and install key in correct format
+    show_progress "gpg --no-default-keyring --keyring ./temp-keyring.gpg --import raspberrypi.gpg.key" "Importando clave"
     sleep 1
     
-    # Command 6
+    # Command 5 - Export key
+    show_progress "gpg --no-default-keyring --keyring ./temp-keyring.gpg --export > raspberrypi-archive-keyring.gpg" "Exportando clave"
+    sleep 1
+    
+    # Command 6 - Move key to trusted.gpg.d
+    show_progress "sudo mv raspberrypi-archive-keyring.gpg /etc/apt/trusted.gpg.d/" "Moviendo clave a trusted.gpg.d"
+    sleep 1
+    
+    # Command 7 - Set permissions
+    show_progress "sudo chmod 644 /etc/apt/trusted.gpg.d/raspberrypi-archive-keyring.gpg" "Configurando permisos"
+    sleep 1
+    
+    # Command 8 - Cleanup
+    show_progress "rm -f raspberrypi.gpg.key temp-keyring.gpg" "Limpiando archivos temporales"
+    sleep 1
+    
+    # Command 9 - Update package lists
     show_progress "sudo apt update" "Actualizando listas de paquetes"
     sleep 1
     
-    # Command 7
-    show_progress "sudo apt-get install -y raspberrypi-kernel" "Instalando kernel Raspberry Pi"
+    # Command 10 - Install kernel packages
+    show_progress "sudo apt install -y kalipi-kernel kalipi-kernel-headers" "Instalando kernel Kali Pi"
     
     # Countdown for reboot
     for i in {10..1}; do
