@@ -150,7 +150,7 @@ kaliberryconfig() {
     sleep 1
     
     # Command 1 - Backup current configuration
-    show_progress "sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup" "Respaldando configuración actual"
+    show_progress "sudo cp /etc/apt/sources.list /etc/apt/backupsoucelist.txt" "Respaldando configuración actual"
     sleep 1
     
     # Command 2 - Configure repositories for Raspberry Pi Zero 2 W
@@ -203,7 +203,8 @@ EOF'" "Configurando repositorios para Pi Zero 2 W"
     # Actually reboot the system
     sudo reboot
 }
-# Function for ColorBerry Display option
+
+# Function for ColorBerry Display Drivers Instalation
 colorberrydisplay() {
     # First ensure we're in the correct directory
     cd /home/kali/KaliBerry > /dev/null 2>&1 || {
@@ -211,12 +212,12 @@ colorberrydisplay() {
         return 1
     }
 
-     # Command 1
-    show_progress_continue "cd KaliBerry" "Copiando directorio jdi-drm-rpi"
-    sleep 1
-    
-    # Command 2
+    # Command 1
     show_progress_continue "sudo cp -r jdi-drm-rpi /var/tmp/" "Copiando directorio jdi-drm-rpi"
+    sleep 1
+
+     # Command 2
+    show_progress_continue "cd /" "Saliendo al directorio Raiz"
     sleep 1
     
     # Command 3
@@ -283,17 +284,20 @@ rm /tmp/bashrc_append.txt" "Configurando .bashrc"
     show_progress_continue "sudo apt-get install -y python3-pip" "Instalando python3-pip"
     sleep 1
     
-    # Command 12 - Install RPi.GPIO
+    # Command 13 - Install RPi.GPIO
     show_progress_continue "pip3 install RPi.GPIO" "Instalando RPi.GPIO"
     sleep 1
 
-    # Success message
+    # Clear screen and show success message
     clear
     dialog --colors --title "ColorBerry Display" --backtitle "KaliBerry Config" \
-        --infobox "Instalación Exitosa" 3 30
+        --msgbox "Instalación de drivers completada exitosamente.\n\nSe ha configurado:\n- Driver de pantalla jdi-drm-rpi\n- Configuración I2C\n- Scripts de arranque\n- Configuración .bashrc\n- Dependencias Python" 12 70
     sleep 2
 
-   # Countdown for reboot
+    # Clear screen again before reboot countdown
+    clear
+
+    # Countdown for reboot
     for i in {5..1}; do
         dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
             --infobox "EL EQUIPO SE VA A REINICIAR\n\nTiempo restante: $i segundos" 5 50
@@ -302,9 +306,7 @@ rm /tmp/bashrc_append.txt" "Configurando .bashrc"
     
     # Actually reboot the system
     sudo reboot
-
 }
-
 # Function for Colorberry-KBD option
 colorberrykbd() {
     # First ensure we're in the correct directory
