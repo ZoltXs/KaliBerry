@@ -250,11 +250,11 @@ colorberrydisplay() {
     sleep 1
     
     # Command 9
-    show_progress_continue "sudo crontab -l 2>/dev/null; echo '@reboot sleep 5; /home/kali/sbin/back.py &' | crontab -" "Configurando crontab"
+    show_progress_continue "(sudo crontab -l 2>/dev/null; echo '@reboot sleep 5; /home/kali/sbin/back.py &') | sudo crontab -" "Configurando crontab"
     sleep 1
 
     # Command 10
-    show_progress_continue  "echo \"dtoverlay=sharp-drm\" | sudo tee -a /boot/config.t>
+    show_progress_continue "echo 'dtoverlay=sharp-drm' | sudo tee -a /boot/config.txt" "Añadiendo overlay a config.txt"
     sleep 1
     
     # Command 10 - Enable i2c
@@ -347,7 +347,7 @@ colorberrykbd() {
 # Function for Exit option
 exit_app() {
     dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
-        --infobox "Gracias por utilizar KaliBerry Config By N@Xs\n\nNo se olvide de instalar el driver del teclado" 7 60
+        --msgbox "Gracias por utilizar KaliBerry Config By N@Xs\n\nNo se olvide de instalar el driver del teclado" 7 60
     sleep 1
     clear
     exit 0
