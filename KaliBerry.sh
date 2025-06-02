@@ -178,8 +178,8 @@ EOF'" "Configurando repositorios para Pi Zero 2 W"
     sleep 1
     
     # Command 5 - Update package lists
-    # show_progress "sudo apt-get update" "Actualizando listas de paquetes"
-    # sleep 1
+    show_progress "sudo apt-get update" "Actualizando listas de paquetes"
+    sleep 1
     
     # Command 6 - Install Raspberry Pi kernel packages for Zero 2 W
     show_progress "sudo apt-get install -y raspberrypi-kernel" "Instalando kernel para Pi Zero 2 W"
