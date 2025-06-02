@@ -250,7 +250,7 @@ colorberrydisplay() {
     sleep 1
     
     # Command 9
-    show_progress_continue "(sudo crontab -l 2>/dev/null; echo '@reboot sleep 5; /home/kali/sbin/back.py &') | crontab -" "Configurando crontab"
+    show_progress_continue "sudo crontab -l 2>/dev/null; echo '@reboot sleep 5; /home/kali/sbin/back.py &' | crontab -" "Configurando crontab"
     sleep 1
 
     # Command 10
