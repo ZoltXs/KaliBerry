@@ -1,22 +1,5 @@
 #!/bin/bash
 
-# Ruta completa a la imagen
-IMAGE_PATH="/ruta/completa/a/KaliBerry.png"
-
-# Verifica si fbi está instalado
-if ! command -v fbi &> /dev/null; then
-    echo "Preparando KaliBerry Config..."
-    # Instala fbi en segundo plano sin mostrar salida
-    sudo apt-get install -y fbi &> /dev/null &
-    # Espera breve mientras instala en segundo plano
-    sleep 3
-else
-    # Mostrar la imagen si fbi ya está instalado
-    fbi -T 1 -a "$IMAGE_PATH" &> /dev/null &
-    sleep 2
-    killall fbi
-fi
-
 # Limpiar pantalla antes de iniciar el menú
 clear
 
@@ -163,43 +146,52 @@ kaliberryconfig() {
     }
     
     dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
-        --infobox "Instalando, aproveche a tomarse un cafe!!!" 3 50
+        --infobox "Configurando Debian 11 para Raspberry Pi Zero 2 W..." 3 55
     sleep 1
     
-    # Command 1 - Edit sources.list with official Kali repositories only
+    # Command 1 - Backup current configuration
+    show_progress "sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup" "Respaldando configuración actual"
+    sleep 1
+    
+    # Command 2 - Configure repositories for Raspberry Pi Zero 2 W
     show_progress "sudo bash -c 'cat > /etc/apt/sources.list << EOF
-# Official Kali Linux repositories for ARM/Raspberry Pi
-deb http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware
-deb-src http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware
-EOF'" "Configurando repositorios oficiales de Kali"
+# Debian 11 (Bullseye) repositories for armhf (32-bit)
+deb http://deb.debian.org/debian bullseye main contrib non-free
+deb http://security.debian.org/debian-security bullseye-security main contrib non-free
+deb http://deb.debian.org/debian bullseye-updates main contrib non-free
+
+# Raspberry Pi repository - essential for Pi Zero 2 W
+deb http://archive.raspberrypi.org/debian/ bullseye main
+EOF'" "Configurando repositorios para Pi Zero 2 W"
     sleep 1
     
-    # Command 2 - Remove any existing conflicting keys
-    show_progress "sudo rm -f /etc/apt/trusted.gpg.d/*" "Limpiando claves existentes"
+    # Command 3 - Download Raspberry Pi archive key directly
+    show_progress "wget -qO- https://archive.raspberrypi.org/debian/raspberrypi.gpg.key | sudo apt-key add -" "Importando clave Raspberry Pi"
     sleep 1
     
-    # Command 3 - Download and install Kali key using modern method
-    show_progress "wget -qO- https://archive.kali.org/archive-key.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg" "Descargando clave oficial de Kali Linux"
-    sleep 1
-    
-    # Command 4 - Set proper permissions for the key
-    show_progress "sudo chmod 644 /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg" "Configurando permisos de clave"
+    # Command 4 - Download Debian archive key
+    show_progress "wget -qO- https://ftp-master.debian.org/keys/archive-key-11.asc | sudo apt-key add -" "Importando clave Debian 11"
     sleep 1
     
     # Command 5 - Update package lists
     show_progress "sudo apt-get update" "Actualizando listas de paquetes"
     sleep 1
     
-    # Command 6 - Install Kali archive keyring package
-    show_progress "sudo apt-get install -y kali-archive-keyring" "Instalando keyring oficial de Kali"
+    # Command 6 - Install Raspberry Pi kernel packages for Zero 2 W
+    show_progress "sudo apt-get install -y raspberrypi-kernel" "Instalando kernel para Pi Zero 2 W"
     sleep 1
     
-    # Command 7 - Install Kali Linux core tools
-    show_progress "sudo apt-get install -y kali-linux-core" "Instalando herramientas core de Kali Linux"
+    # Command 7 - Install kernel headers
+    show_progress "sudo apt-get install -y raspberrypi-kernel-headers" "Instalando headers del kernel"
     sleep 1
     
-    # Command 8 - Install Raspberry Pi specific packages
-    show_progress "sudo apt-get install -y linux-headers-arm64 firmware-brcm80211" "Instalando soporte para Raspberry Pi"
+    # Command 8 - Install essential development tools
+    show_progress "sudo apt-get install -y build-essential git wget" "Instalando herramientas de desarrollo"
+    
+    # Success message
+    dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
+        --msgbox "Configuración para Raspberry Pi Zero 2 W completada.\n\nSe ha instalado:\n- Kernel optimizado para Pi Zero 2 W\n- Headers del kernel\n- Herramientas de desarrollo" 12 70
+    sleep 3
     
     # Countdown for reboot
     for i in {10..1}; do
