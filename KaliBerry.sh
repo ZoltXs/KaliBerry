@@ -204,11 +204,11 @@ EOF'" "Configurando sources.list"
     sleep 1
     
     # Command 9 - Update package lists
-    show_progress "sudo apt update" "Actualizando listas de paquetes"
+    show_progress "sudo apt-get update" "Actualizando listas de paquetes"
     sleep 1
     
     # Command 10 - Install kernel packages
-    show_progress "sudo apt install raspberrypi-kernel raspberrypi-kernel-headers" "Instalando kernel Debian 11 bullseye"
+    show_progress "sudo apt-get install raspberrypi-kernel raspberrypi-kernel-headers" "Instalando kernel Debian 11 bullseye"
     
     # Countdown for reboot
     for i in {10..1}; do
@@ -298,7 +298,7 @@ rm /tmp/bashrc_append.txt" "Configurando .bashrc"
     sleep 1
     
     # Command 12 - Install python3-pip
-    show_progress_continue "sudo apt install -y python3-pip" "Instalando python3-pip"
+    show_progress_continue "sudo apt-get install -y python3-pip" "Instalando python3-pip"
     sleep 1
     
     # Command 12 - Install RPi.GPIO
