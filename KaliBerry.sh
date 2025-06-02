@@ -315,10 +315,6 @@ colorberrykbd() {
         return 1
     }
 
-        # Cambiar al directorio del d (usa show_progress_continue por si no existe el directorio o hay fallo menor)
-    show_progress_continue "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
-    sleep 1
-
     # Cambiar al directorio del driver (usa show_progress_continue por si no existe el directorio o hay fallo menor)
     show_progress_continue "cd beepberry-keyboard-driver" "Cambiando al directorio del driver de teclado"
     sleep 1
@@ -344,6 +340,7 @@ colorberrykbd() {
 exit_app() {
     dialog --colors --title "KaliBerry Config" --backtitle "KaliBerry Config" \
         --infobox "Gracias por utilizar KaliBerry Config By N@Xs" 3 50
+        --infobox "No se olvide de instalar el driver del teclado" 13 50
     sleep 1
     clear
     exit 0
