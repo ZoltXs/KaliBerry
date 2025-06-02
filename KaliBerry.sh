@@ -166,50 +166,40 @@ kaliberryconfig() {
         --infobox "Instalando, aproveche a tomarse un cafe!!!" 3 50
     sleep 1
     
-    # Command 1 - Edit sources.list with new content
+    # Command 1 - Edit sources.list with official Kali repositories only
     show_progress "sudo bash -c 'cat > /etc/apt/sources.list << EOF
-deb http://deb.debian.org/debian bullseye main contrib non-free
-deb http://deb.debian.org/debian bullseye-updates main contrib non-free
-deb http://security.debian.org/debian-security bullseye-security main contrib non-free
-deb http://archive.raspberrypi.org/debian bullseye main
-EOF'" "Configurando sources.list"
+# Official Kali Linux repositories for ARM/Raspberry Pi
+deb http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware
+deb-src http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware
+EOF'" "Configurando repositorios oficiales de Kali"
     sleep 1
     
-    # Command 2 - Remove previous corrupt keys
-    show_progress "sudo rm -f /etc/apt/trusted.gpg.d/raspberrypi*.gpg" "Eliminando claves previas corruptas"
+    # Command 2 - Remove any existing conflicting keys
+    show_progress "sudo rm -f /etc/apt/trusted.gpg.d/*" "Limpiando claves existentes"
     sleep 1
     
-    # Command 3 - Download official key
-    show_progress "wget -q -O raspberrypi.gpg.key https://archive.raspberrypi.org/debian/raspberrypi.gpg.key" "Descargando clave oficial"
-    sleep 1
-
-    # Command 4 - Import key without prompting
-    show_progress "gpg --batch --yes --no-default-keyring --keyring ./temp-keyring.gpg --import raspberrypi.gpg.key" "Importando clave"
-    sleep 1
-
-    # Command 5 - Export key
-    show_progress "gpg --no-default-keyring --keyring ./temp-keyring.gpg --export > raspberrypi-archive-keyring.gpg" "Exportando clave"
-    sleep 1
-
-    
-    # Command 6 - Move key to trusted.gpg.d
-    show_progress "sudo mv raspberrypi-archive-keyring.gpg /etc/apt/trusted.gpg.d/" "Moviendo clave a trusted.gpg.d"
+    # Command 3 - Download and install Kali key using modern method
+    show_progress "wget -qO- https://archive.kali.org/archive-key.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg" "Descargando clave oficial de Kali Linux"
     sleep 1
     
-    # Command 7 - Set permissions
-    show_progress "sudo chmod 644 /etc/apt/trusted.gpg.d/raspberrypi-archive-keyring.gpg" "Configurando permisos"
+    # Command 4 - Set proper permissions for the key
+    show_progress "sudo chmod 644 /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg" "Configurando permisos de clave"
     sleep 1
     
-    # Command 8 - Cleanup
-    show_progress "rm -f raspberrypi.gpg.key temp-keyring.gpg" "Limpiando archivos temporales"
-    sleep 1
-    
-    # Command 9 - Update package lists
+    # Command 5 - Update package lists
     show_progress "sudo apt-get update" "Actualizando listas de paquetes"
     sleep 1
     
-    # Command 10 - Install kernel packages
-    show_progress "sudo apt-get install raspberrypi-kernel raspberrypi-kernel-headers" "Instalando kernel Debian 11 bullseye"
+    # Command 6 - Install Kali archive keyring package
+    show_progress "sudo apt-get install -y kali-archive-keyring" "Instalando keyring oficial de Kali"
+    sleep 1
+    
+    # Command 7 - Install Kali Linux core tools
+    show_progress "sudo apt-get install -y kali-linux-core" "Instalando herramientas core de Kali Linux"
+    sleep 1
+    
+    # Command 8 - Install Raspberry Pi specific packages
+    show_progress "sudo apt-get install -y linux-headers-arm64 firmware-brcm80211" "Instalando soporte para Raspberry Pi"
     
     # Countdown for reboot
     for i in {10..1}; do
@@ -221,7 +211,6 @@ EOF'" "Configurando sources.list"
     # Actually reboot the system
     sudo reboot
 }
-
 # Function for ColorBerry Display option
 colorberrydisplay() {
     # First ensure we're in the correct directory
