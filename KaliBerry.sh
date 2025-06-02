@@ -164,6 +164,10 @@ deb http://deb.debian.org/debian bullseye-updates main contrib non-free
 deb http://archive.raspberrypi.org/debian/ bullseye main
 EOF'" "Configurando repositorios para Pi Zero 2 W"
     sleep 1
+
+    # Command 2.5
+    show_progress "sudo rm /etc/apt/sources.list.d/re4son.list" "Borrando Kali list"
+    sleep 1
     
     # Command 3 - Download Raspberry Pi archive key directly
     show_progress "wget -qO- https://archive.raspberrypi.org/debian/raspberrypi.gpg.key | sudo apt-key add -" "Importando clave Raspberry Pi"
