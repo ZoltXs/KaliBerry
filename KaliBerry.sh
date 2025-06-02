@@ -180,16 +180,17 @@ EOF'" "Configurando sources.list"
     sleep 1
     
     # Command 3 - Download official key
-    show_progress "wget https://archive.raspberrypi.org/debian/raspberrypi.gpg.key" "Descargando clave oficial"
+    show_progress "wget -q -O raspberrypi.gpg.key https://archive.raspberrypi.org/debian/raspberrypi.gpg.key" "Descargando clave oficial"
     sleep 1
-    
-    # Command 4 - Convert and install key in correct format
-    show_progress "gpg --no-default-keyring --keyring ./temp-keyring.gpg --import raspberrypi.gpg.key" "Importando clave"
+
+    # Command 4 - Import key without prompting
+    show_progress "gpg --batch --yes --no-default-keyring --keyring ./temp-keyring.gpg --import raspberrypi.gpg.key" "Importando clave"
     sleep 1
-    
+
     # Command 5 - Export key
     show_progress "gpg --no-default-keyring --keyring ./temp-keyring.gpg --export > raspberrypi-archive-keyring.gpg" "Exportando clave"
     sleep 1
+
     
     # Command 6 - Move key to trusted.gpg.d
     show_progress "sudo mv raspberrypi-archive-keyring.gpg /etc/apt/trusted.gpg.d/" "Moviendo clave a trusted.gpg.d"
