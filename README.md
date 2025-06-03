@@ -1,29 +1,65 @@
-Welcome to KaliBerry Installer for ColorBerry
+<p align="center">
+  <img src="KaliBerry.PNG" alt="KaliBerry Logo" width="300"/>
+</p>
 
-Follow these steps to install Kali Linux on your ColorBerry.
+# **KaliBerry - Installer for ColorBerry** 🐍🍓
 
-Step 1. Download this Kali image to your computer and install it on your SD card using Raspberry Pi or another application.
+**KaliBerry** is an interactive installer for **Kali Linux** on devices with a **ColorBerry** display.  
+It automates and simplifies the installation of:
 
-https://old.kali.org/arm-images/kali-2024.2/kali-linux-2024.2-raspberry-pi-armhf.img.xz
+### 🛠️ Repositories and kernel for Raspberry Pi Zero 2 W  
+### 🖥️ Display driver for ColorBerry  
+### ⌨️ Keyboard driver for Beepberry  
+### ⚙️ Complete bash environment setup in Kali Linux
 
-Step 2. Access Kali and configure the Wi-Fi network. In the clock option, right-click and click. The properties option will appear. Add your country's time zone for time correction to avoid issues with network downloads.
+All through a simple, text-based interface using `dialog`.
 
-Step 3. Access via SSH and run this command to download KaliBerry.
+---
 
+## 🚀 Installing Kali Linux on ColorBerry
+
+Follow these steps to get your **ColorBerry** fully operational:
+
+---
+
+### 🔽 1. Download and install the Kali Linux image
+
+🔗 [kali-linux-2024.2-raspberry-pi-armhf.img.xz](https://old.kali.org/arm-images/kali-2024.2/kali-linux-2024.2-raspberry-pi-armhf.img.xz)
+
+Flash it to your SD card using **Raspberry Pi Imager**, **Balena Etcher**, or any other tool.
+
+---
+
+### ⚙️ 2. First boot and setup
+
+1. Boot into Kali on your ColorBerry  
+2. Connect to your **Wi-Fi** network  
+3. Right-click the **clock widget** and select **Properties**  
+4. Set your **timezone** to correct the system clock and avoid download errors
+
+---
+
+### 💻 3. Clone the KaliBerry repository
+
+Open a terminal or connect via SSH and run:
+
+```bash
 sudo git clone https://github.com/ZoltXs/KaliBerry
-
-Step 4. Access the KaliBerry directory.
-
+📁 4. Enter the KaliBerry folder
 cd KaliBerry
-
-Step 5. Grant permissions to the script.
-
+🔐 5. Make the script executable
 sudo chmod +x KaliBerry.sh
-
-Step 6. Run Kaliberry.sh
-
+▶️ 6. Run the installer
 sudo ./KaliBerry.sh
+🧭 7. Follow the step-by-step installer
+Select every option from Option 1 through Option 4, without skipping any.
+⚠️ If you interrupt the process, you must start again from Step 1.
 
-Step 7. Follow the installation steps starting with option 1 and continuing through option 4. Do not skip any options; otherwise, the installation will not be possible, and you will have to start over from Step 1.
+✅ All done!
 
-IF YOU FOLLOW ALL THE STEPS DESCRIBED IN THIS README, CONGRATULATIONS! YOU NOW HAVE YOUR COLORBERRY WITH KALI-LINUX PERFECTLY CONFIGURED.
+If you've followed every step, your ColorBerry is now fully set up and running Kali Linux 🎉
+
+🧠 Credits
+
+Project maintained by ZoltXs
+
