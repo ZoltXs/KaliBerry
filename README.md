@@ -52,7 +52,7 @@ sudo chmod +x KaliBerry.sh
 ▶️ 6. Run the installer
 sudo ./KaliBerry.sh
 🧭 7. Follow the step-by-step installer
-Select every option from Option 1 through Option 4, without skipping any.
+Select every option from Option 1 through Option 5, without skipping any.
 ⚠️ If you interrupt the process, you must start again from Step 1.
 
 ✅ All done!
