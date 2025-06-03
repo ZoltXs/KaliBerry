@@ -60,6 +60,13 @@ Select every option from Option 1 through Option 5, without skipping any.
 If you've followed every step, your ColorBerry is now fully set up and running Kali Linux 🎉
 
 🧠 Credits
+If you need any help with the display and keyboard drivers, please check out the builder's repository:
+https://github.com/hyphenlee/jdi-drm-rpi
 
 Project maintained by ZoltXs
+
+If you want to help me with my great work and support me in building more projects like this, buy me a coffee ☕️.
+
+Pulsa en este enlace para ayudarme. 😜
+https://paypal.me/JbNoXs?country.x=ES&locale.x=es_ES
 
