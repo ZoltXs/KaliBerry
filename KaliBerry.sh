@@ -233,8 +233,8 @@ colorberrydisplay() {
     show_progress_make_silent "sudo make" "Compilando driver"
     sleep 1
     
-    # Command 5 - Make install command with silent error handling
-    show_progress_make_silent "sudo make install" "Instalando driver"
+    # Command 5 - MODIFIED: Use our manual make install function
+    manual_make_install "Instalando driver"
     sleep 1
     
     # Command 6
