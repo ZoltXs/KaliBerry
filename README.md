@@ -67,6 +67,6 @@ Project maintained by ZoltXs
 
 If you want to help me with my great work and support me in building more projects like this, buy me a coffee ☕️.
 
-Pulsa en este enlace para ayudarme. 😜
+Click this link to help me. 😜 👇👇
 https://paypal.me/JbNoXs?country.x=ES&locale.x=es_ES
 
