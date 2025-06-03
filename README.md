@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="KaliBerry.PNG" alt="KaliBerry Logo" width="300"/>
+  <img src="KaliBerry.png" alt="KaliBerry Logo" width="300"/>
 </p>
 
 # **KaliBerry - Installer for ColorBerry** 🐍🍓
