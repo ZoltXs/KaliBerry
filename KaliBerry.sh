@@ -287,6 +287,7 @@ guimode() {
     show_progress_continue "sudo apt-get install -y xorg" "Installing X server"
     show_progress_continue "sudo systemctl enable lightdm" "Enabling display manager"
     show_progress_continue "sudo systemctl enable gdm3" "Enabling GNOME display manager"
+    show_progress_continue "echo "mouse" | sudo tee /sys/module/beepy_kbd/parameters/touch_as > /dev/null"
 
     clear
     dialog --colors --title "GUI Mode" --backtitle "KaliBerry Config" \
