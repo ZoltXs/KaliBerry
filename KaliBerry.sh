@@ -342,8 +342,8 @@ main_menu() {
             3 "Colorberry-KBD" \
             4 "Terminal Mode" \
             5 "GUI Mode" \
-            6 "Update" \
-            7 "Exit" \
+            6 "Exit" \
+            
             3>&1 1>&2 2>&3)
         
         case $choice in
