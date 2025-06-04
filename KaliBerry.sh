@@ -305,23 +305,6 @@ guimode() {
     sudo reboot
 }
 
-# Function for Update option
-update() {
-    show_progress_continue "sudo rm /etc/apt/sources.list" "Removing current sources.list"
-    show_progress_continue "sudo mv /etc/apt/backupsoucelist.txt /etc/apt/sources.list" "Restoring original configuration"
-    show_progress_continue "sudo apt-key del ED444FF07D8D0BF6" "Removing existing keys"
-    show_progress_continue "sudo rm -rf /etc/apt/trusted.gpg.d/*" "Cleaning keys directory"
-    show_progress_continue "wget -qO- https://archive.kali.org/archive-key.asc | sudo apt-key add -" "Importing official Kali Linux key"
-    show_progress_continue "wget -qO- https://www.kali.org/archive-key.asc | sudo apt-key add -" "Importing additional Kali key"
-    show_progress_continue "sudo apt update" "Updating package lists"
-    show_progress_continue "sudo apt upgrade -y" "Upgrading system"
-
-    dialog --colors --title "Update" --backtitle "KaliBerry Config" \
-        --msgbox "Update completed\n\nRemember never update Kernel Headers" 7 40
-    sleep 3
-
-    main_menu
-}
 
 # Function for Exit option
 exit_app() {
