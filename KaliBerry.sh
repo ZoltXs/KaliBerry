@@ -163,6 +163,8 @@ EOF'" "Configuring repositories for Pi Zero 2 W"
     
     show_progress "wget -qO- https://ftp-master.debian.org/keys/archive-key-11.asc | sudo apt-key add -" "Importing Debian 11 key"
     
+    show_progress "sudo apt update" "Updating System"
+    
     show_progress "sudo apt-get install -y raspberrypi-kernel" "Installing kernel for Pi Zero 2 W"
     
     show_progress "sudo apt-get install -y raspberrypi-kernel-headers" "Installing kernel headers"
